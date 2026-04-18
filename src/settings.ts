@@ -11,6 +11,7 @@ import {
 export type { BiNoteSettings };
 
 export const DEFAULT_SETTINGS: BiNoteSettings = {
+	confirmBeforeCreate: true,
 	calendarViews: [
 		{
 			id: generateId(),
@@ -46,6 +47,16 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl).setName('Calendar views').setHeading();
+
+		new Setting(containerEl)
+			.setName('Create note confirmation')
+			.setDesc('点击缺失笔记时，先确认是否创建。')
+			.addToggle((toggle) => {
+				toggle.setValue(this.plugin.settings.confirmBeforeCreate).onChange((value) => {
+					this.plugin.settings.confirmBeforeCreate = value;
+					void this.plugin.saveSettings();
+				});
+			});
 
 		containerEl.createEl('p', {
 			text: '配置日历视图及每个视图的笔记来源。',

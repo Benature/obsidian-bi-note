@@ -15,6 +15,7 @@ export default class BiNotePlugin extends Plugin {
 		);
 
 		this.addSettingTab(new BiNoteSettingTab(this.app, this));
+		this.registerVaultRefreshEvents();
 
 		this.registerCalendarCommands();
 
@@ -28,6 +29,24 @@ export default class BiNotePlugin extends Plugin {
 	}
 
 	onunload(): void {}
+
+	private registerVaultRefreshEvents(): void {
+		this.registerEvent(
+			this.app.vault.on('create', () => {
+				this.refreshAllCalendarViews();
+			}),
+		);
+		this.registerEvent(
+			this.app.vault.on('delete', () => {
+				this.refreshAllCalendarViews();
+			}),
+		);
+		this.registerEvent(
+			this.app.vault.on('rename', () => {
+				this.refreshAllCalendarViews();
+			}),
+		);
+	}
 
 	private registerCalendarCommands(): void {
 		for (const config of this.settings.calendarViews) {
@@ -57,6 +76,10 @@ export default class BiNotePlugin extends Plugin {
 
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
+		this.refreshAllCalendarViews();
+	}
+
+	refreshAllCalendarViews(): void {
 		for (const leaf of this.app.workspace.getLeavesOfType(CALENDAR_VIEW_TYPE)) {
 			if (leaf.view instanceof CalendarView) {
 				leaf.view.refresh();

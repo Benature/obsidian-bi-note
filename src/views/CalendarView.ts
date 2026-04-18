@@ -1,4 +1,13 @@
-import { App, ItemView, Notice, TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian';
+import {
+	App,
+	ItemView,
+	Modal,
+	Notice,
+	Setting,
+	TFile,
+	ViewStateResult,
+	WorkspaceLeaf,
+} from 'obsidian';
 import type BiNotePlugin from '../main';
 import type { CalendarViewConfig } from '../types';
 import { getFilePath, isSameDay } from '../utils/dateUtils';
@@ -197,6 +206,13 @@ export class CalendarView extends ItemView {
 		let file = this.app.vault.getAbstractFileByPath(filePath);
 
 		if (!(file instanceof TFile)) {
+			if (this.plugin.settings.confirmBeforeCreate) {
+				const shouldCreate = await confirmCreateNote(this.app, filePath);
+				if (!shouldCreate) {
+					return;
+				}
+			}
+
 			const dir = filePath.substring(0, filePath.lastIndexOf('/'));
 			if (dir) {
 				await ensureFolder(this.app, dir);
@@ -216,6 +232,67 @@ export class CalendarView extends ItemView {
 			await leaf.openFile(file);
 		}
 	}
+}
+
+class ConfirmCreateNoteModal extends Modal {
+	private readonly filePath: string;
+	private readonly onSubmit: (confirmed: boolean) => void;
+
+	constructor(app: App, filePath: string, onSubmit: (confirmed: boolean) => void) {
+		super(app);
+		this.filePath = filePath;
+		this.onSubmit = onSubmit;
+	}
+
+	onOpen(): void {
+		const { contentEl } = this;
+		contentEl.empty();
+
+		contentEl.createEl('h3', { text: '创建笔记？' });
+		contentEl.createEl('p', {
+			text: `目标文件不存在，是否创建并打开？`,
+		});
+		contentEl.createEl('code', {
+			text: this.filePath,
+		});
+
+		new Setting(contentEl)
+			.addButton((button) => {
+				button.setButtonText('取消').onClick(() => {
+					this.onSubmit(false);
+					this.close();
+				});
+			})
+			.addButton((button) => {
+				button.setButtonText('创建').setCta().onClick(() => {
+					this.onSubmit(true);
+					this.close();
+				});
+			});
+	}
+
+	onClose(): void {
+		this.contentEl.empty();
+	}
+}
+
+function confirmCreateNote(app: App, filePath: string): Promise<boolean> {
+	return new Promise((resolve) => {
+		let resolved = false;
+		const modal = new ConfirmCreateNoteModal(app, filePath, (confirmed) => {
+			resolved = true;
+			resolve(confirmed);
+		});
+
+		modal.onClose = () => {
+			modal.contentEl.empty();
+			if (!resolved) {
+				resolve(false);
+			}
+		};
+
+		modal.open();
+	});
 }
 
 async function ensureFolder(app: App, folderPath: string): Promise<void> {

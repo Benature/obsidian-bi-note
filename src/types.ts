@@ -14,6 +14,7 @@ export interface CalendarViewConfig {
 
 export interface BiNoteSettings {
 	calendarViews: CalendarViewConfig[];
+	confirmBeforeCreate: boolean;
 }
 
 export const DEFAULT_COLORS = [
