@@ -1,0 +1,61 @@
+name: Release plugin
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: Existing tag to publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  PLUGIN_ID: bi-note
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref_name }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag_name || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Package release files
+        run: |
+          mkdir "${PLUGIN_ID}"
+          cp main.js manifest.json styles.css "${PLUGIN_ID}"
+          zip -r "${PLUGIN_ID}-${RELEASE_TAG}.zip" "${PLUGIN_ID}"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.RELEASE_TAG }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: |
+            main.js
+            manifest.json
+            styles.css
+            ${{ env.PLUGIN_ID }}-${{ env.RELEASE_TAG }}.zip
