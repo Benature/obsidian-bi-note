@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "bi-note",
+	"version": "0.0.1",
+	"description": "Multiple customizable calendar views for Obsidian notes across different folders.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
