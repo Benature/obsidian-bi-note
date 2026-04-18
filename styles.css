@@ -1,8 +1,379 @@
-/*
+/* ═══════════════════════════════════════════════════════════════════════════
+   Calendar View
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.bi-note-calendar-container {
+	padding: 12px 16px;
+	height: 100%;
+	overflow-y: auto;
+	box-sizing: border-box;
+}
 
-If your plugin does not need CSS, delete this file.
+/* ── Header ─────────────────────────────────────────────────────────────── */
 
-*/
+.bi-note-calendar-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.bi-note-header-left,
+.bi-note-header-right {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.bi-note-nav-btn {
+	background: var(--background-modifier-hover);
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	padding: 3px 10px;
+	font-size: 18px;
+	line-height: 1.2;
+	color: var(--text-normal);
+}
+
+.bi-note-nav-btn:hover {
+	background: var(--background-modifier-active-hover);
+}
+
+.bi-note-month-title {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--text-normal);
+}
+
+.bi-note-today-btn {
+	background: transparent;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	cursor: pointer;
+	padding: 3px 8px;
+	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.bi-note-today-btn:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+/* ── Legend ─────────────────────────────────────────────────────────────── */
+
+.bi-note-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.bi-note-legend-item {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.bi-note-legend-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* ── Calendar grid ──────────────────────────────────────────────────────── */
+
+.bi-note-calendar-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 3px;
+}
+
+.bi-note-day-header {
+	text-align: center;
+	font-size: 11px;
+	color: var(--text-faint);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	padding: 4px 0 6px;
+}
+
+.bi-note-day-cell {
+	display: flex;
+	flex-direction: column;
+	border-radius: 5px;
+	overflow: hidden;
+	background: var(--background-secondary);
+	min-height: 44px;
+}
+
+.bi-note-day-empty {
+	background: transparent;
+}
+
+.bi-note-today {
+	outline: 2px solid var(--color-accent);
+	outline-offset: -2px;
+}
+
+.bi-note-day-number {
+	font-size: 12px;
+	padding: 4px 5px 2px;
+	color: var(--text-muted);
+	flex: 1;
+	text-align: right;
+}
+
+.bi-note-today .bi-note-day-number {
+	color: var(--color-accent);
+	font-weight: 700;
+}
+
+/* ── Source indicators (split-cell strip) ───────────────────────────────── */
+
+.bi-note-day-sources {
+	display: flex;
+	height: 8px;
+	gap: 1px;
+}
+
+.bi-note-source-indicator {
+	flex: 1;
+	cursor: pointer;
+	transition: opacity 0.15s, filter 0.15s;
+	background-color: var(--background-modifier-border);
+}
+
+.bi-note-source-indicator.exists {
+	/* background-color is set inline via the source color */
+}
+
+.bi-note-source-indicator.missing {
+	background-color: var(--background-modifier-border);
+	opacity: 0.5;
+}
+
+.bi-note-source-indicator:hover {
+	filter: brightness(1.2);
+	opacity: 1;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+
+.bi-note-empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--text-faint);
+	font-size: 14px;
+	text-align: center;
+	padding: 32px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Settings Tab
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.bi-note-settings-desc {
+	color: var(--text-muted);
+	font-size: 13px;
+	margin-bottom: 16px;
+}
+
+.bi-note-settings-views {
+	margin-bottom: 12px;
+}
+
+.bi-note-settings-view-card {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 14px;
+	background: var(--background-secondary);
+}
+
+.bi-note-settings-view-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 14px;
+}
+
+.bi-note-settings-view-name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.bi-note-label {
+	font-size: 13px;
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+
+.bi-note-view-name-input {
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	padding: 4px 8px;
+	font-size: 14px;
+	color: var(--text-normal);
+	width: 200px;
+}
+
+.bi-note-settings-view-actions {
+	display: flex;
+	gap: 6px;
+}
+
+.bi-note-settings-section-title {
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--text-faint);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	margin-bottom: 8px;
+}
+
+.bi-note-settings-sources {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 10px;
+}
+
+.bi-note-settings-source-item {
+	display: flex;
+	align-items: flex-end;
+	gap: 10px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	padding: 10px 12px;
+	flex-wrap: wrap;
+}
+
+.bi-note-settings-source-color {
+	display: flex;
+	align-items: center;
+	padding-bottom: 2px;
+}
+
+.bi-note-color-input {
+	width: 34px;
+	height: 34px;
+	padding: 2px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	cursor: pointer;
+	background: none;
+}
+
+.bi-note-settings-source-field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.bi-note-path-field {
+	flex: 1;
+	min-width: 200px;
+}
+
+.bi-note-field-label {
+	font-size: 10px;
+	font-weight: 700;
+	color: var(--text-faint);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.bi-note-text-input {
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	padding: 4px 8px;
+	font-size: 13px;
+	color: var(--text-normal);
+	min-width: 140px;
+}
+
+.bi-note-path-input {
+	font-family: var(--font-monospace);
+	font-size: 12px;
+}
+
+.bi-note-field-hint {
+	font-size: 11px;
+	color: var(--text-faint);
+}
+
+.bi-note-settings-source-delete {
+	display: flex;
+	align-items: flex-end;
+	padding-bottom: 2px;
+	margin-left: auto;
+}
+
+/* ── Shared button styles ───────────────────────────────────────────────── */
+
+.bi-note-btn {
+	background: var(--background-modifier-hover);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	cursor: pointer;
+	padding: 5px 12px;
+	font-size: 13px;
+	color: var(--text-normal);
+	transition: background 0.12s;
+	white-space: nowrap;
+}
+
+.bi-note-btn:hover {
+	background: var(--background-modifier-active-hover);
+}
+
+.bi-note-btn-cta {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+.bi-note-btn-cta:hover {
+	background: var(--interactive-accent-hover);
+}
+
+.bi-note-btn-secondary {
+	background: transparent;
+	color: var(--text-muted);
+	border-style: dashed;
+}
+
+.bi-note-btn-secondary:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.bi-note-btn-danger {
+	color: var(--text-error);
+}
+
+.bi-note-btn-danger:hover {
+	background: var(--background-modifier-error-hover);
+}
+
+.bi-note-btn-icon {
+	padding: 4px 8px;
+	font-size: 16px;
+	line-height: 1;
+}
