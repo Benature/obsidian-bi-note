@@ -7,6 +7,8 @@
 	height: 100%;
 	overflow-y: auto;
 	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
@@ -92,6 +94,10 @@
 .bi-note-calendar-grid {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
+	grid-template-rows: auto repeat(
+		var(--bi-note-calendar-week-rows, 6),
+		minmax(var(--bi-note-day-cell-min-height, 44px), auto)
+	);
 	gap: 3px;
 }
 
@@ -111,7 +117,7 @@
 	border-radius: 5px;
 	overflow: hidden;
 	background: var(--background-secondary);
-	min-height: 44px;
+	min-height: var(--bi-note-day-cell-min-height, 44px);
 }
 
 .bi-note-day-empty {
@@ -127,7 +133,6 @@
 	font-size: 12px;
 	padding: 4px 5px 2px;
 	color: var(--text-muted);
-	flex: 1;
 	text-align: right;
 }
 
@@ -140,19 +145,23 @@
 
 .bi-note-day-sources {
 	display: flex;
-	height: 8px;
+	flex-direction: column;
+	gap: 1px;
+	padding: 1px;
+	margin-top: auto;
+}
+
+.bi-note-day-sources-row {
+	display: grid;
 	gap: 1px;
 }
 
 .bi-note-source-indicator {
-	flex: 1;
 	cursor: pointer;
 	transition: opacity 0.15s, filter 0.15s;
 	background-color: var(--background-modifier-border);
-}
-
-.bi-note-source-indicator.exists {
-	/* background-color is set inline via the source color */
+	height: var(--bi-note-source-indicator-min-height, 12px);
+	border-radius: 2px;
 }
 
 .bi-note-source-indicator.missing {
@@ -308,6 +317,11 @@
 	min-width: 140px;
 }
 
+.bi-note-number-input {
+	min-width: 84px;
+	width: 84px;
+}
+
 .bi-note-path-input {
 	font-family: var(--font-monospace);
 	font-size: 12px;
@@ -318,9 +332,10 @@
 	color: var(--text-faint);
 }
 
-.bi-note-settings-source-delete {
+.bi-note-settings-source-actions {
 	display: flex;
 	align-items: flex-end;
+	gap: 6px;
 	padding-bottom: 2px;
 	margin-left: auto;
 }
@@ -376,4 +391,9 @@
 	padding: 4px 8px;
 	font-size: 16px;
 	line-height: 1;
+}
+
+.bi-note-btn:disabled {
+	cursor: not-allowed;
+	opacity: 0.45;
 }

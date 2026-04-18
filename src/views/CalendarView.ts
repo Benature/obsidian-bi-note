@@ -9,7 +9,13 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import type BiNotePlugin from '../main';
-import type { CalendarViewConfig } from '../types';
+import {
+	DEFAULT_SOURCE_INDICATOR_HEIGHT,
+	DEFAULT_DAY_CELL_MIN_HEIGHT,
+	type CalendarViewConfig,
+	normalizeDayCellMinHeight,
+	normalizeSourceIndicatorHeight,
+} from '../types';
 import { getFilePath, isSameDay } from '../utils/dateUtils';
 
 export const CALENDAR_VIEW_TYPE = 'bi-note-calendar';
@@ -87,6 +93,14 @@ export class CalendarView extends ItemView {
 			return;
 		}
 
+		container.style.setProperty(
+			'--bi-note-source-indicator-min-height',
+			`${getSourceIndicatorHeight(config)}px`,
+		);
+		container.style.setProperty(
+			'--bi-note-day-cell-min-height',
+			`${getDayCellMinHeight(config)}px`,
+		);
 		this.renderCalendar(container, config);
 	}
 
@@ -162,9 +176,12 @@ export class CalendarView extends ItemView {
 
 		const firstDay = new Date(this.currentYear, this.currentMonth, 1);
 		const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+		const leadingEmptyCells = firstDay.getDay();
+		const weekRows = Math.ceil((leadingEmptyCells + daysInMonth) / 7);
+		grid.style.setProperty('--bi-note-calendar-week-rows', String(weekRows));
 
 		// Leading empty cells
-		for (let i = 0; i < firstDay.getDay(); i++) {
+		for (let i = 0; i < leadingEmptyCells; i++) {
 			grid.createDiv('bi-note-day-cell bi-note-day-empty');
 		}
 
@@ -179,26 +196,42 @@ export class CalendarView extends ItemView {
 			cell.createDiv({ text: String(d), cls: 'bi-note-day-number' });
 
 			if (config.sources.length > 0) {
-				const sourcesRow = cell.createDiv('bi-note-day-sources');
-				for (const source of config.sources) {
-					const filePath = getFilePath(source.pathTemplate, date);
-					const file = this.app.vault.getAbstractFileByPath(filePath);
-					const exists = file instanceof TFile;
+				const sourcesWrap = cell.createDiv('bi-note-day-sources');
+				let sourceIndex = 0;
+				for (const rowLength of getSourceRowLengths(config.sources.length)) {
+					const sourcesRow = sourcesWrap.createDiv('bi-note-day-sources-row');
+					sourcesRow.style.gridTemplateColumns = `repeat(${rowLength}, minmax(0, 1fr))`;
 
-					const indicator = sourcesRow.createDiv({
-						cls: `bi-note-source-indicator ${exists ? 'exists' : 'missing'}`,
-					});
-					if (exists) {
-						indicator.style.backgroundColor = source.color;
+					for (let i = 0; i < rowLength; i++) {
+						const source = config.sources[sourceIndex++];
+						if (!source) {
+							continue;
+						}
+
+						const filePath = getFilePath(source.pathTemplate, date);
+						const file = this.app.vault.getAbstractFileByPath(filePath);
+						const exists = file instanceof TFile;
+
+						const indicator = sourcesRow.createDiv({
+							cls: `bi-note-source-indicator ${exists ? 'exists' : 'missing'}`,
+						});
+						if (exists) {
+							indicator.style.backgroundColor = source.color;
+						}
+						indicator.title = `${source.name}${exists ? '' : '（未创建）'}`;
+
+						indicator.addEventListener('click', (e: MouseEvent) => {
+							e.stopPropagation();
+							void this.openOrCreateNote(filePath);
+						});
 					}
-					indicator.title = `${source.name}${exists ? '' : '（未创建）'}`;
-
-					indicator.addEventListener('click', (e: MouseEvent) => {
-						e.stopPropagation();
-						void this.openOrCreateNote(filePath);
-					});
 				}
 			}
+		}
+
+		const trailingEmptyCells = weekRows * 7 - (leadingEmptyCells + daysInMonth);
+		for (let i = 0; i < trailingEmptyCells; i++) {
+			grid.createDiv('bi-note-day-cell bi-note-day-empty');
 		}
 	}
 
@@ -309,4 +342,28 @@ async function ensureFolder(app: App, folderPath: string): Promise<void> {
 			}
 		}
 	}
+}
+
+function getSourceRowLengths(sourceCount: number): number[] {
+	if (sourceCount <= 0) {
+		return [];
+	}
+
+	const rows = Math.ceil(sourceCount / Math.ceil(Math.sqrt(sourceCount)));
+	const baseSize = Math.floor(sourceCount / rows);
+	const remainder = sourceCount % rows;
+
+	return Array.from({ length: rows }, (_, index) => baseSize + (index >= rows - remainder ? 1 : 0));
+}
+
+function getSourceIndicatorHeight(config: CalendarViewConfig): number {
+	return normalizeSourceIndicatorHeight(
+		config.sourceIndicatorHeight ?? DEFAULT_SOURCE_INDICATOR_HEIGHT,
+	);
+}
+
+function getDayCellMinHeight(config: CalendarViewConfig): number {
+	return normalizeDayCellMinHeight(
+		config.dayCellMinHeight ?? DEFAULT_DAY_CELL_MIN_HEIGHT,
+	);
 }

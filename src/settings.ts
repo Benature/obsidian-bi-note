@@ -5,7 +5,15 @@ import {
 	CalendarViewConfig,
 	NoteSource,
 	DEFAULT_COLORS,
+	DEFAULT_DAY_CELL_MIN_HEIGHT,
+	DEFAULT_SOURCE_INDICATOR_HEIGHT,
 	generateId,
+	MAX_DAY_CELL_MIN_HEIGHT,
+	MAX_SOURCE_INDICATOR_HEIGHT,
+	MIN_DAY_CELL_MIN_HEIGHT,
+	MIN_SOURCE_INDICATOR_HEIGHT,
+	normalizeDayCellMinHeight,
+	normalizeSourceIndicatorHeight,
 } from './types';
 
 export type { BiNoteSettings };
@@ -16,6 +24,8 @@ export const DEFAULT_SETTINGS: BiNoteSettings = {
 		{
 			id: generateId(),
 			name: 'Daily notes',
+			sourceIndicatorHeight: DEFAULT_SOURCE_INDICATOR_HEIGHT,
+			dayCellMinHeight: DEFAULT_DAY_CELL_MIN_HEIGHT,
 			sources: [
 				{
 					id: generateId(),
@@ -80,6 +90,8 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		const newView: CalendarViewConfig = {
 			id: generateId(),
 			name: 'New calendar view',
+			sourceIndicatorHeight: DEFAULT_SOURCE_INDICATOR_HEIGHT,
+			dayCellMinHeight: DEFAULT_DAY_CELL_MIN_HEIGHT,
 			sources: [
 				{
 					id: generateId(),
@@ -143,6 +155,46 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		});
 		deleteBtn.addEventListener('click', () => {
 			void this.deleteCalendarView(index);
+		});
+
+		const indicatorHeightSetting = new Setting(card)
+			.setName('来源格高度')
+			.setDesc('设置日历里每个笔记来源小格的高度（像素）。');
+		const indicatorHeightInput = indicatorHeightSetting.controlEl.createEl('input', {
+			cls: 'bi-note-text-input bi-note-number-input',
+			attr: {
+				type: 'number',
+				min: String(MIN_SOURCE_INDICATOR_HEIGHT),
+				max: String(MAX_SOURCE_INDICATOR_HEIGHT),
+				step: '1',
+				value: String(normalizeSourceIndicatorHeight(config.sourceIndicatorHeight)),
+			},
+		});
+		indicatorHeightInput.addEventListener('change', () => {
+			config.sourceIndicatorHeight = normalizeSourceIndicatorHeight(
+				indicatorHeightInput.value,
+			);
+			indicatorHeightInput.value = String(config.sourceIndicatorHeight);
+			void this.plugin.saveSettings();
+		});
+
+		const dayCellHeightSetting = new Setting(card)
+			.setName('日期格最低高度')
+			.setDesc('设置日历中每天那个大格子的最低高度（像素）。');
+		const dayCellHeightInput = dayCellHeightSetting.controlEl.createEl('input', {
+			cls: 'bi-note-text-input bi-note-number-input',
+			attr: {
+				type: 'number',
+				min: String(MIN_DAY_CELL_MIN_HEIGHT),
+				max: String(MAX_DAY_CELL_MIN_HEIGHT),
+				step: '1',
+				value: String(normalizeDayCellMinHeight(config.dayCellMinHeight)),
+			},
+		});
+		dayCellHeightInput.addEventListener('change', () => {
+			config.dayCellMinHeight = normalizeDayCellMinHeight(dayCellHeightInput.value);
+			dayCellHeightInput.value = String(config.dayCellMinHeight);
+			void this.plugin.saveSettings();
 		});
 
 		// ── Sources ───────────────────────────────────────────────────────────
@@ -235,9 +287,28 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			cls: 'bi-note-field-hint',
 		});
 
+		const actionsWrap = row.createDiv('bi-note-settings-source-actions');
+
+		const moveUpBtn = actionsWrap.createEl('button', {
+			text: '↑',
+			cls: 'bi-note-btn bi-note-btn-icon',
+		});
+		moveUpBtn.disabled = sourceIndex === 0;
+		moveUpBtn.addEventListener('click', () => {
+			void this.moveSource(config, sourceIndex, -1);
+		});
+
+		const moveDownBtn = actionsWrap.createEl('button', {
+			text: '↓',
+			cls: 'bi-note-btn bi-note-btn-icon',
+		});
+		moveDownBtn.disabled = sourceIndex === config.sources.length - 1;
+		moveDownBtn.addEventListener('click', () => {
+			void this.moveSource(config, sourceIndex, 1);
+		});
+
 		// Delete button
-		const deleteWrap = row.createDiv('bi-note-settings-source-delete');
-		const deleteBtn = deleteWrap.createEl('button', {
+		const deleteBtn = actionsWrap.createEl('button', {
 			text: '×',
 			cls: 'bi-note-btn bi-note-btn-icon bi-note-btn-danger',
 		});
@@ -248,6 +319,26 @@ export class BiNoteSettingTab extends PluginSettingTab {
 
 	private async deleteSource(config: CalendarViewConfig, sourceIndex: number): Promise<void> {
 		config.sources.splice(sourceIndex, 1);
+		await this.plugin.saveSettings();
+		this.display();
+	}
+
+	private async moveSource(
+		config: CalendarViewConfig,
+		sourceIndex: number,
+		direction: -1 | 1,
+	): Promise<void> {
+		const targetIndex = sourceIndex + direction;
+		if (targetIndex < 0 || targetIndex >= config.sources.length) {
+			return;
+		}
+
+		const [source] = config.sources.splice(sourceIndex, 1);
+		if (!source) {
+			return;
+		}
+
+		config.sources.splice(targetIndex, 0, source);
 		await this.plugin.saveSettings();
 		this.display();
 	}
