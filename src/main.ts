@@ -1,7 +1,13 @@
 import { Plugin } from 'obsidian';
-import type { BiNoteSettings } from './types';
+import type { BiNoteSettings, CalendarViewConfig } from './types';
 import { DEFAULT_SETTINGS, BiNoteSettingTab } from './settings';
 import { CALENDAR_VIEW_TYPE, CalendarView } from './views/CalendarView';
+import {
+	DEFAULT_DAY_CELL_MIN_HEIGHT,
+	DEFAULT_SOURCE_INDICATOR_HEIGHT,
+	normalizeDayCellMinHeight,
+	normalizeSourceIndicatorHeight,
+} from './types';
 
 export default class BiNotePlugin extends Plugin {
 	settings: BiNoteSettings;
@@ -71,7 +77,15 @@ export default class BiNotePlugin extends Plugin {
 
 	async loadSettings(): Promise<void> {
 		const saved = (await this.loadData()) as Partial<BiNoteSettings> | null;
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
+		const migratedHeights = getMigratedGlobalHeights(saved?.calendarViews);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, migratedHeights, saved, {
+			globalSourceIndicatorHeight: normalizeSourceIndicatorHeight(
+				saved?.globalSourceIndicatorHeight ?? migratedHeights.globalSourceIndicatorHeight,
+			),
+			globalDayCellMinHeight: normalizeDayCellMinHeight(
+				saved?.globalDayCellMinHeight ?? migratedHeights.globalDayCellMinHeight,
+			),
+		});
 	}
 
 	async saveSettings(): Promise<void> {
@@ -86,4 +100,24 @@ export default class BiNotePlugin extends Plugin {
 			}
 		}
 	}
+}
+
+function getMigratedGlobalHeights(
+	calendarViews: CalendarViewConfig[] | undefined,
+): Pick<BiNoteSettings, 'globalSourceIndicatorHeight' | 'globalDayCellMinHeight'> {
+	const firstSourceIndicatorHeight = calendarViews?.find(
+		(view) => typeof view.sourceIndicatorHeight === 'number',
+	)?.sourceIndicatorHeight;
+	const firstDayCellMinHeight = calendarViews?.find(
+		(view) => typeof view.dayCellMinHeight === 'number',
+	)?.dayCellMinHeight;
+
+	return {
+		globalSourceIndicatorHeight: normalizeSourceIndicatorHeight(
+			firstSourceIndicatorHeight ?? DEFAULT_SOURCE_INDICATOR_HEIGHT,
+		),
+		globalDayCellMinHeight: normalizeDayCellMinHeight(
+			firstDayCellMinHeight ?? DEFAULT_DAY_CELL_MIN_HEIGHT,
+		),
+	};
 }

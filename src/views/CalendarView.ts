@@ -10,8 +10,6 @@ import {
 } from 'obsidian';
 import type BiNotePlugin from '../main';
 import {
-	DEFAULT_SOURCE_INDICATOR_HEIGHT,
-	DEFAULT_DAY_CELL_MIN_HEIGHT,
 	type CalendarViewConfig,
 	normalizeDayCellMinHeight,
 	normalizeSourceIndicatorHeight,
@@ -95,11 +93,11 @@ export class CalendarView extends ItemView {
 
 		container.style.setProperty(
 			'--bi-note-source-indicator-min-height',
-			`${getSourceIndicatorHeight(config)}px`,
+			`${getSourceIndicatorHeight(this.plugin)}px`,
 		);
 		container.style.setProperty(
 			'--bi-note-day-cell-min-height',
-			`${getDayCellMinHeight(config)}px`,
+			`${getDayCellMinHeight(this.plugin)}px`,
 		);
 		this.renderCalendar(container, config);
 	}
@@ -356,14 +354,10 @@ function getSourceRowLengths(sourceCount: number): number[] {
 	return Array.from({ length: rows }, (_, index) => baseSize + (index >= rows - remainder ? 1 : 0));
 }
 
-function getSourceIndicatorHeight(config: CalendarViewConfig): number {
-	return normalizeSourceIndicatorHeight(
-		config.sourceIndicatorHeight ?? DEFAULT_SOURCE_INDICATOR_HEIGHT,
-	);
+function getSourceIndicatorHeight(plugin: BiNotePlugin): number {
+	return normalizeSourceIndicatorHeight(plugin.settings.globalSourceIndicatorHeight);
 }
 
-function getDayCellMinHeight(config: CalendarViewConfig): number {
-	return normalizeDayCellMinHeight(
-		config.dayCellMinHeight ?? DEFAULT_DAY_CELL_MIN_HEIGHT,
-	);
+function getDayCellMinHeight(plugin: BiNotePlugin): number {
+	return normalizeDayCellMinHeight(plugin.settings.globalDayCellMinHeight);
 }

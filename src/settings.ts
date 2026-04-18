@@ -20,12 +20,12 @@ export type { BiNoteSettings };
 
 export const DEFAULT_SETTINGS: BiNoteSettings = {
 	confirmBeforeCreate: true,
+	globalSourceIndicatorHeight: DEFAULT_SOURCE_INDICATOR_HEIGHT,
+	globalDayCellMinHeight: DEFAULT_DAY_CELL_MIN_HEIGHT,
 	calendarViews: [
 		{
 			id: generateId(),
 			name: 'Daily notes',
-			sourceIndicatorHeight: DEFAULT_SOURCE_INDICATOR_HEIGHT,
-			dayCellMinHeight: DEFAULT_DAY_CELL_MIN_HEIGHT,
 			sources: [
 				{
 					id: generateId(),
@@ -68,6 +68,45 @@ export class BiNoteSettingTab extends PluginSettingTab {
 				});
 			});
 
+		new Setting(containerEl)
+			.setName('来源格高度')
+			.setDesc('设置所有日历视图里每个笔记来源小格的高度（像素）。')
+			.addText((text) => {
+				text.inputEl.type = 'number';
+				text.inputEl.min = String(MIN_SOURCE_INDICATOR_HEIGHT);
+				text.inputEl.max = String(MAX_SOURCE_INDICATOR_HEIGHT);
+				text.inputEl.step = '1';
+				text.inputEl.addClass('bi-note-number-input');
+				text.setValue(
+					String(
+						normalizeSourceIndicatorHeight(this.plugin.settings.globalSourceIndicatorHeight),
+					),
+				).onChange((value) => {
+					this.plugin.settings.globalSourceIndicatorHeight =
+						normalizeSourceIndicatorHeight(value);
+					text.setValue(String(this.plugin.settings.globalSourceIndicatorHeight));
+					void this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName('日期格最低高度')
+			.setDesc('设置所有日历视图中每天那个大格子的最低高度（像素）。')
+			.addText((text) => {
+				text.inputEl.type = 'number';
+				text.inputEl.min = String(MIN_DAY_CELL_MIN_HEIGHT);
+				text.inputEl.max = String(MAX_DAY_CELL_MIN_HEIGHT);
+				text.inputEl.step = '1';
+				text.inputEl.addClass('bi-note-number-input');
+				text.setValue(
+					String(normalizeDayCellMinHeight(this.plugin.settings.globalDayCellMinHeight)),
+				).onChange((value) => {
+					this.plugin.settings.globalDayCellMinHeight = normalizeDayCellMinHeight(value);
+					text.setValue(String(this.plugin.settings.globalDayCellMinHeight));
+					void this.plugin.saveSettings();
+				});
+			});
+
 		containerEl.createEl('p', {
 			text: '配置日历视图及每个视图的笔记来源。',
 			cls: 'bi-note-settings-desc',
@@ -83,6 +122,14 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		addBtn.addEventListener('click', () => {
 			void this.addCalendarView();
 		});
+
+		containerEl.createEl('div', {
+			cls: 'bi-note-settings-footer-divider',
+		});
+		containerEl.createEl('div', {
+			text: '路径模板支持常见的 moment 风格占位符，例如 YYYY、MM、DD、ddd、dddd。像 daily/ 这样的普通路径文本会原样保留，并会自动补上 .md 后缀。',
+			cls: 'bi-note-field-hint',
+		});
 	}
 
 	private async addCalendarView(): Promise<void> {
@@ -90,8 +137,6 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		const newView: CalendarViewConfig = {
 			id: generateId(),
 			name: 'New calendar view',
-			sourceIndicatorHeight: DEFAULT_SOURCE_INDICATOR_HEIGHT,
-			dayCellMinHeight: DEFAULT_DAY_CELL_MIN_HEIGHT,
 			sources: [
 				{
 					id: generateId(),
@@ -155,46 +200,6 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		});
 		deleteBtn.addEventListener('click', () => {
 			void this.deleteCalendarView(index);
-		});
-
-		const indicatorHeightSetting = new Setting(card)
-			.setName('来源格高度')
-			.setDesc('设置日历里每个笔记来源小格的高度（像素）。');
-		const indicatorHeightInput = indicatorHeightSetting.controlEl.createEl('input', {
-			cls: 'bi-note-text-input bi-note-number-input',
-			attr: {
-				type: 'number',
-				min: String(MIN_SOURCE_INDICATOR_HEIGHT),
-				max: String(MAX_SOURCE_INDICATOR_HEIGHT),
-				step: '1',
-				value: String(normalizeSourceIndicatorHeight(config.sourceIndicatorHeight)),
-			},
-		});
-		indicatorHeightInput.addEventListener('change', () => {
-			config.sourceIndicatorHeight = normalizeSourceIndicatorHeight(
-				indicatorHeightInput.value,
-			);
-			indicatorHeightInput.value = String(config.sourceIndicatorHeight);
-			void this.plugin.saveSettings();
-		});
-
-		const dayCellHeightSetting = new Setting(card)
-			.setName('日期格最低高度')
-			.setDesc('设置日历中每天那个大格子的最低高度（像素）。');
-		const dayCellHeightInput = dayCellHeightSetting.controlEl.createEl('input', {
-			cls: 'bi-note-text-input bi-note-number-input',
-			attr: {
-				type: 'number',
-				min: String(MIN_DAY_CELL_MIN_HEIGHT),
-				max: String(MAX_DAY_CELL_MIN_HEIGHT),
-				step: '1',
-				value: String(normalizeDayCellMinHeight(config.dayCellMinHeight)),
-			},
-		});
-		dayCellHeightInput.addEventListener('change', () => {
-			config.dayCellMinHeight = normalizeDayCellMinHeight(dayCellHeightInput.value);
-			dayCellHeightInput.value = String(config.dayCellMinHeight);
-			void this.plugin.saveSettings();
 		});
 
 		// ── Sources ───────────────────────────────────────────────────────────
@@ -281,10 +286,6 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		pathInput.addEventListener('change', () => {
 			source.pathTemplate = pathInput.value;
 			void this.plugin.saveSettings();
-		});
-		pathField.createEl('div', {
-			text: 'Uses common moment-style tokens such as YYYY, MM, DD, ddd, and dddd. Plain path text like daily/ stays literal, and .md is added automatically.',
-			cls: 'bi-note-field-hint',
 		});
 
 		const actionsWrap = row.createDiv('bi-note-settings-source-actions');
