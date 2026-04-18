@@ -1,7 +1,7 @@
 export interface NoteSource {
 	id: string;
 	name: string;
-	/** Full path template without .md extension, e.g. "daily/YYYY/MM/YYYY-MM-DD" */
+	/** Full path template without .md extension, e.g. "daily/YYYY/MM/YYYY-MM-DD_ddd". */
 	pathTemplate: string;
 	color: string;
 }

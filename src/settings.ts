@@ -223,7 +223,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			attr: {
 				type: 'text',
 				value: source.pathTemplate,
-				placeholder: 'e.g. daily/YYYY/MM/YYYY-MM-DD',
+				placeholder: 'e.g. daily/YYYY/MM/YYYY-MM-DD_ddd',
 			},
 		});
 		pathInput.addEventListener('change', () => {
@@ -231,7 +231,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			void this.plugin.saveSettings();
 		});
 		pathField.createEl('div', {
-			text: 'Use year, month, and day placeholders. The .md suffix is added automatically.',
+			text: 'Uses common moment-style tokens such as YYYY, MM, DD, ddd, and dddd. Plain path text like daily/ stays literal, and .md is added automatically.',
 			cls: 'bi-note-field-hint',
 		});
 
