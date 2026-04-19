@@ -26,7 +26,6 @@ export default class BiNotePlugin extends Plugin {
 
 		this.registerCalendarCommands();
 
-		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		this.addRibbonIcon('calendar', this.t('main.ribbonTooltip'), () => {
 			const first = this.settings.calendarViews[0];
 			if (first) {
@@ -77,16 +76,20 @@ export default class BiNotePlugin extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		const saved = (await this.loadData()) as Partial<BiNoteSettings> | null;
+		const savedData: unknown = await this.loadData();
+		const saved = isRecord(savedData) ? (savedData as Partial<BiNoteSettings>) : null;
 		const migratedHeights = getMigratedGlobalHeights(saved?.calendarViews);
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, migratedHeights, saved, {
+		this.settings = {
+			...DEFAULT_SETTINGS,
+			...migratedHeights,
+			...(saved ?? {}),
 			globalSourceIndicatorHeight: normalizeSourceIndicatorHeight(
 				saved?.globalSourceIndicatorHeight ?? migratedHeights.globalSourceIndicatorHeight,
 			),
 			globalDayCellMinHeight: normalizeDayCellMinHeight(
 				saved?.globalDayCellMinHeight ?? migratedHeights.globalDayCellMinHeight,
 			),
-		});
+		};
 	}
 
 	async saveSettings(): Promise<void> {
@@ -129,4 +132,8 @@ function getMigratedGlobalHeights(
 			firstDayCellMinHeight ?? DEFAULT_DAY_CELL_MIN_HEIGHT,
 		),
 	};
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null;
 }
