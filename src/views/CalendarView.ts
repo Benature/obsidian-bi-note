@@ -9,6 +9,7 @@ import {
 	WorkspaceLeaf,
 } from 'obsidian';
 import type BiNotePlugin from '../main';
+import { formatMonthLabel, getWeekdayLabels } from '../i18n';
 import {
 	type CalendarViewConfig,
 	normalizeDayCellMinHeight,
@@ -38,7 +39,7 @@ export class CalendarView extends ItemView {
 
 	getDisplayText(): string {
 		const config = this.getConfig();
-		return config ? config.name : 'Calendar';
+		return config ? config.name : this.plugin.t('calendar.defaultTitle');
 	}
 
 	getIcon(): string {
@@ -81,12 +82,13 @@ export class CalendarView extends ItemView {
 		const container = this.contentEl;
 		container.empty();
 		container.addClass('bi-note-calendar-container');
+		const tr = this.plugin.t.bind(this.plugin);
 
 		const config = this.getConfig();
 		if (!config) {
 			container.createEl('div', {
 				cls: 'bi-note-empty-state',
-				text: '未找到日历配置，请在插件设置中检查。',
+				text: tr('calendar.configMissing'),
 			});
 			return;
 		}
@@ -104,6 +106,8 @@ export class CalendarView extends ItemView {
 
 	private renderCalendar(container: HTMLElement, config: CalendarViewConfig): void {
 		const today = new Date();
+		const language = this.plugin.getLanguage();
+		const tr = this.plugin.t.bind(this.plugin);
 
 		// ── Header ────────────────────────────────────────────────────────────
 		const header = container.createDiv('bi-note-calendar-header');
@@ -114,16 +118,13 @@ export class CalendarView extends ItemView {
 
 		header.createEl('span', {
 			cls: 'bi-note-month-title',
-			text: new Date(this.currentYear, this.currentMonth, 1).toLocaleString('default', {
-				month: 'long',
-				year: 'numeric',
-			}),
+			text: formatMonthLabel(new Date(this.currentYear, this.currentMonth, 1), language),
 		});
 
 		const rightControls = header.createDiv('bi-note-header-right');
 		const todayBtn = rightControls.createEl('button', {
 			cls: 'bi-note-today-btn',
-			text: 'Today',
+			text: tr('calendar.today'),
 		});
 
 		prevBtn.addEventListener('click', () => {
@@ -167,7 +168,7 @@ export class CalendarView extends ItemView {
 		// ── Calendar grid ─────────────────────────────────────────────────────
 		const grid = container.createDiv('bi-note-calendar-grid');
 
-		const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+		const dayNames = getWeekdayLabels(language);
 		for (const name of dayNames) {
 			grid.createDiv({ text: name, cls: 'bi-note-day-header' });
 		}
@@ -216,7 +217,7 @@ export class CalendarView extends ItemView {
 						if (exists) {
 							indicator.style.backgroundColor = source.color;
 						}
-						indicator.title = `${source.name}${exists ? '' : '（未创建）'}`;
+						indicator.title = `${source.name}${exists ? '' : tr('calendar.missingNoteSuffix')}`;
 
 						indicator.addEventListener('click', (e: MouseEvent) => {
 							e.stopPropagation();
@@ -238,7 +239,7 @@ export class CalendarView extends ItemView {
 
 		if (!(file instanceof TFile)) {
 			if (this.plugin.settings.confirmBeforeCreate) {
-				const shouldCreate = await confirmCreateNote(this.app, filePath);
+				const shouldCreate = await confirmCreateNote(this.app, this.plugin, filePath);
 				if (!shouldCreate) {
 					return;
 				}
@@ -253,7 +254,7 @@ export class CalendarView extends ItemView {
 				// Refresh so the new note is reflected
 				this.render();
 			} catch {
-				new Notice(`创建笔记失败：${filePath}`);
+				new Notice(this.plugin.t('calendar.createNoteFailed', { path: filePath }));
 				return;
 			}
 		}
@@ -266,11 +267,18 @@ export class CalendarView extends ItemView {
 }
 
 class ConfirmCreateNoteModal extends Modal {
+	private readonly plugin: BiNotePlugin;
 	private readonly filePath: string;
 	private readonly onSubmit: (confirmed: boolean) => void;
 
-	constructor(app: App, filePath: string, onSubmit: (confirmed: boolean) => void) {
+	constructor(
+		app: App,
+		plugin: BiNotePlugin,
+		filePath: string,
+		onSubmit: (confirmed: boolean) => void,
+	) {
 		super(app);
+		this.plugin = plugin;
 		this.filePath = filePath;
 		this.onSubmit = onSubmit;
 	}
@@ -279,9 +287,9 @@ class ConfirmCreateNoteModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		contentEl.createEl('h3', { text: '创建笔记？' });
+		contentEl.createEl('h3', { text: this.plugin.t('calendar.confirmCreateTitle') });
 		contentEl.createEl('p', {
-			text: `目标文件不存在，是否创建并打开？`,
+			text: this.plugin.t('calendar.confirmCreateDesc'),
 		});
 		contentEl.createEl('code', {
 			text: this.filePath,
@@ -289,13 +297,13 @@ class ConfirmCreateNoteModal extends Modal {
 
 		new Setting(contentEl)
 			.addButton((button) => {
-				button.setButtonText('取消').onClick(() => {
+				button.setButtonText(this.plugin.t('calendar.cancel')).onClick(() => {
 					this.onSubmit(false);
 					this.close();
 				});
 			})
 			.addButton((button) => {
-				button.setButtonText('创建').setCta().onClick(() => {
+				button.setButtonText(this.plugin.t('calendar.create')).setCta().onClick(() => {
 					this.onSubmit(true);
 					this.close();
 				});
@@ -307,10 +315,10 @@ class ConfirmCreateNoteModal extends Modal {
 	}
 }
 
-function confirmCreateNote(app: App, filePath: string): Promise<boolean> {
+function confirmCreateNote(app: App, plugin: BiNotePlugin, filePath: string): Promise<boolean> {
 	return new Promise((resolve) => {
 		let resolved = false;
-		const modal = new ConfirmCreateNoteModal(app, filePath, (confirmed) => {
+		const modal = new ConfirmCreateNoteModal(app, plugin, filePath, (confirmed) => {
 			resolved = true;
 			resolve(confirmed);
 		});

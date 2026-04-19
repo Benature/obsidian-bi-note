@@ -19,7 +19,10 @@ export interface BiNoteSettings {
 	confirmBeforeCreate: boolean;
 	globalSourceIndicatorHeight: number;
 	globalDayCellMinHeight: number;
+	language: BiNoteLanguage;
 }
+
+export type BiNoteLanguage = 'system' | 'zh-CN' | 'en';
 
 export const DEFAULT_COLORS = [
 	'#4a9eff',

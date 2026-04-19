@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import type BiNotePlugin from './main';
+import { resolveLanguage, t } from './i18n';
 import {
 	BiNoteSettings,
 	CalendarViewConfig,
@@ -22,6 +23,7 @@ export const DEFAULT_SETTINGS: BiNoteSettings = {
 	confirmBeforeCreate: true,
 	globalSourceIndicatorHeight: DEFAULT_SOURCE_INDICATOR_HEIGHT,
 	globalDayCellMinHeight: DEFAULT_DAY_CELL_MIN_HEIGHT,
+	language: 'system',
 	calendarViews: [
 		{
 			id: generateId(),
@@ -55,12 +57,31 @@ export class BiNoteSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
+		const language = resolveLanguage(this.plugin.settings.language);
+		const tr = (key: Parameters<typeof t>[1], vars?: Record<string, string>) =>
+			t(language, key, vars);
 
-		new Setting(containerEl).setName('Calendar views').setHeading();
+		new Setting(containerEl).setName(tr('settings.calendarViewsHeading')).setHeading();
 
 		new Setting(containerEl)
-			.setName('Create note confirmation')
-			.setDesc('点击缺失笔记时，先确认是否创建。')
+			.setName(tr('settings.language.name'))
+			.setDesc(tr('settings.language.desc'))
+			.addDropdown((dropdown) => {
+				dropdown
+					.addOption('system', tr('settings.language.option.system'))
+					.addOption('zh-CN', tr('settings.language.option.zh-CN'))
+					.addOption('en', tr('settings.language.option.en'))
+					.setValue(this.plugin.settings.language)
+					.onChange(async (value) => {
+						this.plugin.settings.language = value as BiNoteSettings['language'];
+						await this.plugin.saveSettings();
+						this.display();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName(tr('settings.confirmBeforeCreate.name'))
+			.setDesc(tr('settings.confirmBeforeCreate.desc'))
 			.addToggle((toggle) => {
 				toggle.setValue(this.plugin.settings.confirmBeforeCreate).onChange((value) => {
 					this.plugin.settings.confirmBeforeCreate = value;
@@ -69,8 +90,8 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('来源格高度')
-			.setDesc('设置所有日历视图里每个笔记来源小格的高度（像素）。')
+			.setName(tr('settings.sourceIndicatorHeight.name'))
+			.setDesc(tr('settings.sourceIndicatorHeight.desc'))
 			.addText((text) => {
 				text.inputEl.type = 'number';
 				text.inputEl.min = String(MIN_SOURCE_INDICATOR_HEIGHT);
@@ -90,8 +111,8 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('日期格最低高度')
-			.setDesc('设置所有日历视图中每天那个大格子的最低高度（像素）。')
+			.setName(tr('settings.dayCellMinHeight.name'))
+			.setDesc(tr('settings.dayCellMinHeight.desc'))
 			.addText((text) => {
 				text.inputEl.type = 'number';
 				text.inputEl.min = String(MIN_DAY_CELL_MIN_HEIGHT);
@@ -108,7 +129,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			});
 
 		containerEl.createEl('p', {
-			text: '配置日历视图及每个视图的笔记来源。',
+			text: tr('settings.calendarViewsDesc'),
 			cls: 'bi-note-settings-desc',
 		});
 
@@ -116,7 +137,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		this.renderCalendarViews(viewsContainer);
 
 		const addBtn = containerEl.createEl('button', {
-			text: '+ 添加日历视图',
+			text: tr('settings.addCalendarView'),
 			cls: 'bi-note-btn bi-note-btn-cta',
 		});
 		addBtn.addEventListener('click', () => {
@@ -127,7 +148,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			cls: 'bi-note-settings-footer-divider',
 		});
 		containerEl.createEl('div', {
-			text: '路径模板支持常见的 moment 风格占位符，例如 YYYY、MM、DD、ddd、dddd。像 daily/ 这样的普通路径文本会原样保留，并会自动补上 .md 后缀。',
+			text: tr('settings.pathTemplateHint'),
 			cls: 'bi-note-field-hint',
 		});
 	}
@@ -136,11 +157,11 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		const colorIndex = this.plugin.settings.calendarViews.length % DEFAULT_COLORS.length;
 		const newView: CalendarViewConfig = {
 			id: generateId(),
-			name: 'New calendar view',
+			name: this.plugin.t('settings.newCalendarView'),
 			sources: [
 				{
 					id: generateId(),
-					name: 'Source A',
+					name: this.plugin.t('settings.newSource', { label: 'A' }),
 					pathTemplate: 'daily/YYYY/MM/YYYY-MM-DD',
 					color: DEFAULT_COLORS[colorIndex] ?? '#4a9eff',
 				},
@@ -168,12 +189,13 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		index: number,
 	): void {
 		const card = container.createDiv('bi-note-settings-view-card');
+		const tr = this.plugin.t.bind(this.plugin);
 
 		// ── Card header ───────────────────────────────────────────────────────
 		const cardHeader = card.createDiv('bi-note-settings-view-header');
 
 		const nameRow = cardHeader.createDiv('bi-note-settings-view-name');
-		nameRow.createEl('span', { text: '视图名称', cls: 'bi-note-label' });
+		nameRow.createEl('span', { text: tr('settings.viewName'), cls: 'bi-note-label' });
 
 		const nameInput = nameRow.createEl('input', {
 			cls: 'bi-note-view-name-input',
@@ -187,7 +209,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		const actions = cardHeader.createDiv('bi-note-settings-view-actions');
 
 		const openBtn = actions.createEl('button', {
-			text: '打开视图',
+			text: tr('settings.openView'),
 			cls: 'bi-note-btn',
 		});
 		openBtn.addEventListener('click', () => {
@@ -195,7 +217,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		});
 
 		const deleteBtn = actions.createEl('button', {
-			text: '删除',
+			text: tr('settings.delete'),
 			cls: 'bi-note-btn bi-note-btn-danger',
 		});
 		deleteBtn.addEventListener('click', () => {
@@ -203,7 +225,10 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		});
 
 		// ── Sources ───────────────────────────────────────────────────────────
-		card.createEl('div', { text: '笔记来源', cls: 'bi-note-settings-section-title' });
+		card.createEl('div', {
+			text: tr('settings.noteSources'),
+			cls: 'bi-note-settings-section-title',
+		});
 
 		const sourcesContainer = card.createDiv('bi-note-settings-sources');
 		for (let j = 0; j < config.sources.length; j++) {
@@ -214,7 +239,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		}
 
 		const addSourceBtn = card.createEl('button', {
-			text: '+ 添加笔记来源',
+			text: tr('settings.addSource'),
 			cls: 'bi-note-btn bi-note-btn-secondary',
 		});
 		addSourceBtn.addEventListener('click', () => {
@@ -232,7 +257,9 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		const colorIndex = config.sources.length % DEFAULT_COLORS.length;
 		const newSource: NoteSource = {
 			id: generateId(),
-			name: `来源 ${String.fromCharCode(65 + config.sources.length)}`,
+			name: this.plugin.t('settings.newSource', {
+				label: String.fromCharCode(65 + config.sources.length),
+			}),
 			pathTemplate: 'daily/YYYY/MM/YYYY-MM-DD',
 			color: DEFAULT_COLORS[colorIndex] ?? '#4a9eff',
 		};
@@ -248,6 +275,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		sourceIndex: number,
 	): void {
 		const row = container.createDiv('bi-note-settings-source-item');
+		const tr = this.plugin.t.bind(this.plugin);
 
 		// Color picker
 		const colorWrap = row.createDiv('bi-note-settings-source-color');
@@ -262,7 +290,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 
 		// Name field
 		const nameField = row.createDiv('bi-note-settings-source-field');
-		nameField.createEl('label', { text: '名称', cls: 'bi-note-field-label' });
+		nameField.createEl('label', { text: tr('settings.sourceName'), cls: 'bi-note-field-label' });
 		const nameInput = nameField.createEl('input', {
 			cls: 'bi-note-text-input',
 			attr: { type: 'text', value: source.name },
@@ -274,13 +302,13 @@ export class BiNoteSettingTab extends PluginSettingTab {
 
 		// Path template field
 		const pathField = row.createDiv('bi-note-settings-source-field bi-note-path-field');
-		pathField.createEl('label', { text: '路径模板', cls: 'bi-note-field-label' });
+		pathField.createEl('label', { text: tr('settings.pathTemplate'), cls: 'bi-note-field-label' });
 		const pathInput = pathField.createEl('input', {
 			cls: 'bi-note-text-input bi-note-path-input',
 			attr: {
 				type: 'text',
 				value: source.pathTemplate,
-				placeholder: 'e.g. daily/YYYY/MM/YYYY-MM-DD_ddd',
+				placeholder: tr('settings.pathTemplatePlaceholder'),
 			},
 		});
 		pathInput.addEventListener('change', () => {

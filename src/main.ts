@@ -2,6 +2,7 @@ import { Plugin } from 'obsidian';
 import type { BiNoteSettings, CalendarViewConfig } from './types';
 import { DEFAULT_SETTINGS, BiNoteSettingTab } from './settings';
 import { CALENDAR_VIEW_TYPE, CalendarView } from './views/CalendarView';
+import { resolveLanguage, t, type ResolvedLanguage } from './i18n';
 import {
 	DEFAULT_DAY_CELL_MIN_HEIGHT,
 	DEFAULT_SOURCE_INDICATOR_HEIGHT,
@@ -26,7 +27,7 @@ export default class BiNotePlugin extends Plugin {
 		this.registerCalendarCommands();
 
 		// eslint-disable-next-line obsidianmd/ui/sentence-case
-		this.addRibbonIcon('calendar', 'Bi-Note calendar', () => {
+		this.addRibbonIcon('calendar', this.t('main.ribbonTooltip'), () => {
 			const first = this.settings.calendarViews[0];
 			if (first) {
 				void this.openCalendarView(first.id);
@@ -58,7 +59,7 @@ export default class BiNotePlugin extends Plugin {
 		for (const config of this.settings.calendarViews) {
 			this.addCommand({
 				id: `open-calendar-${config.id}`,
-				name: `Open calendar: ${config.name}`,
+				name: this.t('main.openCalendarCommand', { name: config.name }),
 				callback: () => {
 					void this.openCalendarView(config.id);
 				},
@@ -99,6 +100,14 @@ export default class BiNotePlugin extends Plugin {
 				leaf.view.refresh();
 			}
 		}
+	}
+
+	getLanguage(): ResolvedLanguage {
+		return resolveLanguage(this.settings.language);
+	}
+
+	t(key: Parameters<typeof t>[1], vars?: Record<string, string>): string {
+		return t(this.getLanguage(), key, vars);
 	}
 }
 
