@@ -1,7 +1,7 @@
 {
 	"id": "bi-note",
 	"name": "Bi-Note",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"minAppVersion": "0.15.0",
 	"description": "Multiple customizable calendar views to visualize daily notes across different folders.",
 	"author": "Benature",

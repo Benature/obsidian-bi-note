@@ -1,90 +1,130 @@
-# Obsidian Sample Plugin
+# Bi-Note
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+[中文说明](./README.zh-CN.md)
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+`Bi-Note` is an Obsidian plugin that lets you visualize notes from multiple folders on a calendar.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+Instead of being limited to a single daily note location, you can define multiple note sources, group them into different calendar views, and see at a glance which notes already exist for each day. Clicking a source indicator opens the note if it exists, or creates it if it does not.
 
-## First time developing plugins?
+## Features
 
-Quick starting guide for new plugin devs:
+- Multiple calendar views for different workflows
+- Multiple note sources per view
+- Color-coded source indicators
+- Support for notes stored across different folders
+- Click to open existing notes or create missing notes
+- Configurable note path templates with moment-style date tokens
+- Adjustable source indicator height and day cell minimum height
+- Chinese and English UI support
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+## How it works
 
-## Releasing new releases
+Each calendar view contains one or more note sources.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+Each source has:
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+- A name
+- A color
+- A path template
 
-## Adding your plugin to the community plugin list
+For every day in the month, Bi-Note checks whether the note for each source exists. If it exists, the source indicator is filled with the configured color. If it is missing, the indicator stays empty. Clicking the indicator opens the note or creates it for you.
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+## Example use cases
 
-## How to use
+- Track personal and work daily notes in separate folders
+- Compare notes from multiple journals in one calendar
+- Build different calendar views for different projects or time horizons
+- Keep parallel note systems without changing your folder structure
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+## Path templates
 
-## Manually installing the plugin
+Path templates support common moment-style tokens such as `YYYY`, `MM`, `DD`, `ddd`, and `dddd`.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+Examples:
 
-## Improve code quality with eslint
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+- `daily/YYYY/MM/YYYY-MM-DD`
+- `work-log/YYYY/YYYY-MM-DD`
+- `journal/YYYY/MM/YYYY-MM-DD_ddd`
 
-## Funding URL
+Bi-Note keeps normal path text as-is and automatically appends `.md` if it is missing.
 
-You can include funding URLs where people who use your plugin can financially support it.
+## Usage
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+1. Open **Settings -> Community plugins -> Bi-Note**.
+2. Create or edit a calendar view.
+3. Add one or more note sources to that view.
+4. Set the path template for each source.
+5. Open the view from the settings page, command palette, or ribbon icon.
+6. Click any source indicator in the calendar to open or create the target note.
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
+## Settings
+
+Bi-Note currently supports:
+
+- Plugin UI language: system, Chinese, or English
+- Confirm before creating a missing note
+- Global source indicator height
+- Global day cell minimum height
+- Multiple calendar views
+- Multiple note sources per calendar view
+
+## Commands
+
+Bi-Note registers one command per calendar view:
+
+- `Open calendar: <view name>`
+
+This makes it easy to open specific views from the command palette.
+
+## Installation for development
+
+```bash
+npm install
 ```
 
-If you have multiple URLs, you can also do:
+Start watch mode:
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
+```bash
+npm run dev
 ```
 
-## API Documentation
+Create a production build:
 
-See https://docs.obsidian.md
+```bash
+npm run build
+```
+
+Run lint checks:
+
+```bash
+npm run lint
+```
+
+## Manual installation
+
+Copy the release files into:
+
+```text
+<your-vault>/.obsidian/plugins/bi-note/
+```
+
+Required files:
+
+- `main.js`
+- `manifest.json`
+- `styles.css`
+
+Then reload Obsidian and enable **Bi-Note** in **Settings -> Community plugins**.
+
+## Release notes
+
+When publishing a new version:
+
+1. Update `manifest.json`.
+2. Update `versions.json`.
+3. Create a GitHub release tagged with the exact plugin version, without a `v` prefix.
+4. Upload `main.js`, `manifest.json`, and `styles.css` as release assets.
+
+## License
+
+`0-BSD`
