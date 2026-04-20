@@ -1,6 +1,6 @@
 # Bi-Note
 
-[English](./README.md)
+[English](./README.md) | [中文](./README.zh-CN.md)
 
 `Bi-Note` 是一个 Obsidian 插件，用来在日历中可视化多个文件夹里的笔记。
 

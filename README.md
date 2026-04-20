@@ -1,6 +1,6 @@
 # Bi-Note
 
-[中文说明](./README.zh-CN.md)
+[English](./README.md) | [中文](./README.zh-CN.md)
 
 `Bi-Note` is an Obsidian plugin that lets you visualize notes from multiple folders on a calendar.
 
