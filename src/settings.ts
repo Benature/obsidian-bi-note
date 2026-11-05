@@ -32,13 +32,13 @@ export const DEFAULT_SETTINGS: BiNoteSettings = {
 				{
 					id: generateId(),
 					name: 'A diary',
-					pathTemplate: 'daily/YYYY/MM/YYYY-MM-DD',
+					pathTemplate: 'daily/{YYYY}/{MM}/{YYYY-MM-DD}',
 					color: DEFAULT_COLORS[0] ?? '#4a9eff',
 				},
 				{
 					id: generateId(),
 					name: 'B diary',
-					pathTemplate: 'daily-b/YYYY/MM/YYYY-MM-DD',
+					pathTemplate: 'daily-b/{YYYY}/{MM}/{YYYY-MM-DD}',
 					color: DEFAULT_COLORS[1] ?? '#ff6b6b',
 				},
 			],
@@ -162,7 +162,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 				{
 					id: generateId(),
 					name: this.plugin.t('settings.newSource', { label: 'A' }),
-					pathTemplate: 'daily/YYYY/MM/YYYY-MM-DD',
+					pathTemplate: 'daily/{YYYY}/{MM}/{YYYY-MM-DD}',
 					color: DEFAULT_COLORS[colorIndex] ?? '#4a9eff',
 				},
 			],
@@ -260,7 +260,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			name: this.plugin.t('settings.newSource', {
 				label: String.fromCharCode(65 + config.sources.length),
 			}),
-			pathTemplate: 'daily/YYYY/MM/YYYY-MM-DD',
+			pathTemplate: 'daily/{YYYY}/{MM}/{YYYY-MM-DD}',
 			color: DEFAULT_COLORS[colorIndex] ?? '#4a9eff',
 		};
 		config.sources.push(newSource);

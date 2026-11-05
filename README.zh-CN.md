@@ -13,7 +13,7 @@
 - 使用颜色区分不同来源
 - 支持跨多个文件夹管理笔记
 - 点击即可打开已有笔记或创建缺失笔记
-- 支持使用类 moment 的日期占位符配置路径模板
+- 支持使用花括号包裹的类 moment 日期格式配置路径模板
 - 可调节来源格高度和日期格最小高度
 - 支持中英文界面
 
@@ -38,15 +38,15 @@
 
 ## 路径模板
 
-路径模板支持常见的类 moment 日期占位符，例如 `YYYY`、`MM`、`DD`、`ddd`、`dddd`。
+路径模板只解析花括号内的类 moment 日期格式，例如 `{YYYY}`、`{MM}`、`{DD}`、`{ddd}`、`{dddd}`。也可以在同一对花括号中组合格式，例如 `{YYYY-MM-DD}`。
 
 示例：
 
-- `daily/YYYY/MM/YYYY-MM-DD`
-- `work-log/YYYY/YYYY-MM-DD`
-- `journal/YYYY/MM/YYYY-MM-DD_ddd`
+- `daily/{YYYY}/{MM}/{YYYY-MM-DD}`
+- `work-log/{YYYY}/{YYYY-MM-DD}`
+- `journal/{YYYY}/{MM}/{YYYY-MM-DD}_{ddd}`
 
-普通路径文本会原样保留；如果路径末尾没有 `.md`，Bi-Note 会自动补上。
+花括号外的普通路径文本会原样保留，因此 `business/{YYYY-MM-DD}` 中的 `ss` 不会被误解析为秒数。如果路径末尾没有 `.md`，Bi-Note 会自动补上。
 
 ## 使用方法
 

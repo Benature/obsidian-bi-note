@@ -13,7 +13,7 @@ Instead of being limited to a single daily note location, you can define multipl
 - Color-coded source indicators
 - Support for notes stored across different folders
 - Click to open existing notes or create missing notes
-- Configurable note path templates with moment-style date tokens
+- Configurable note path templates with brace-wrapped moment-style date formats
 - Adjustable source indicator height and day cell minimum height
 - Chinese and English UI support
 
@@ -38,15 +38,15 @@ For every day in the month, Bi-Note checks whether the note for each source exis
 
 ## Path templates
 
-Path templates support common moment-style tokens such as `YYYY`, `MM`, `DD`, `ddd`, and `dddd`.
+Path templates parse only moment-style date formats inside braces, such as `{YYYY}`, `{MM}`, `{DD}`, `{ddd}`, and `{dddd}`. Formats can also be combined within one pair of braces, such as `{YYYY-MM-DD}`.
 
 Examples:
 
-- `daily/YYYY/MM/YYYY-MM-DD`
-- `work-log/YYYY/YYYY-MM-DD`
-- `journal/YYYY/MM/YYYY-MM-DD_ddd`
+- `daily/{YYYY}/{MM}/{YYYY-MM-DD}`
+- `work-log/{YYYY}/{YYYY-MM-DD}`
+- `journal/{YYYY}/{MM}/{YYYY-MM-DD}_{ddd}`
 
-Bi-Note keeps normal path text as-is and automatically appends `.md` if it is missing.
+Bi-Note keeps normal path text outside braces as-is, so the `ss` in `business/{YYYY-MM-DD}` is not parsed as seconds. It automatically appends `.md` if it is missing.
 
 ## Usage
 
