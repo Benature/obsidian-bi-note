@@ -1,3 +1,4 @@
+import { getLanguage } from 'obsidian';
 import type { ParallelNotesLanguage } from './types';
 
 export type ResolvedLanguage = 'zh-CN' | 'en';
@@ -137,8 +138,7 @@ export function resolveLanguage(language: ParallelNotesLanguage): ResolvedLangua
 		return language;
 	}
 
-	const obsidianLanguage =
-		typeof window !== 'undefined' ? window.localStorage.getItem('language') : null;
+	const obsidianLanguage = getLanguage();
 	const browserLanguage = typeof navigator !== 'undefined' ? navigator.language : '';
 	return normalizeLanguage(obsidianLanguage) ?? normalizeLanguage(browserLanguage) ?? 'en';
 }

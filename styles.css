@@ -197,6 +197,15 @@
 	margin-bottom: 16px;
 }
 
+.parallel-notes-settings-custom {
+	display: block;
+}
+
+.parallel-notes-settings-custom > .setting-item-control {
+	display: block;
+	width: 100%;
+}
+
 .parallel-notes-settings-views {
 	margin-bottom: 12px;
 }

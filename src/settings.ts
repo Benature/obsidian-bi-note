@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 import type ParallelNotesPlugin from './main';
 import { resolveLanguage, t } from './i18n';
 import {
@@ -54,85 +54,91 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	display(): void {
-		const { containerEl } = this;
-		containerEl.empty();
+	getSettingDefinitions(): SettingDefinitionItem[] {
 		const language = resolveLanguage(this.plugin.settings.language);
 		const tr = (key: Parameters<typeof t>[1], vars?: Record<string, string>) =>
 			t(language, key, vars);
 
-		new Setting(containerEl).setName(tr('settings.calendarViewsHeading')).setHeading();
+		return [
+			{
+				name: tr('settings.language.name'),
+				desc: tr('settings.language.desc'),
+				control: {
+					type: 'dropdown',
+					key: 'language',
+					options: {
+						system: tr('settings.language.option.system'),
+						'zh-CN': tr('settings.language.option.zh-CN'),
+						en: tr('settings.language.option.en'),
+					},
+				},
+			},
+			{
+				name: tr('settings.confirmBeforeCreate.name'),
+				desc: tr('settings.confirmBeforeCreate.desc'),
+				control: { type: 'toggle', key: 'confirmBeforeCreate' },
+			},
+			{
+				name: tr('settings.sourceIndicatorHeight.name'),
+				desc: tr('settings.sourceIndicatorHeight.desc'),
+				control: {
+					type: 'number',
+					key: 'globalSourceIndicatorHeight',
+					min: MIN_SOURCE_INDICATOR_HEIGHT,
+					max: MAX_SOURCE_INDICATOR_HEIGHT,
+					step: 1,
+				},
+			},
+			{
+				name: tr('settings.dayCellMinHeight.name'),
+				desc: tr('settings.dayCellMinHeight.desc'),
+				control: {
+					type: 'number',
+					key: 'globalDayCellMinHeight',
+					min: MIN_DAY_CELL_MIN_HEIGHT,
+					max: MAX_DAY_CELL_MIN_HEIGHT,
+					step: 1,
+				},
+			},
+			{
+				name: tr('settings.calendarViewsHeading'),
+				desc: tr('settings.calendarViewsDesc'),
+				render: (setting) => {
+					setting.settingEl.addClass('parallel-notes-settings-custom');
+					this.renderCalendarViewSettings(setting.controlEl);
+				},
+			},
+		];
+	}
 
-		new Setting(containerEl)
-			.setName(tr('settings.language.name'))
-			.setDesc(tr('settings.language.desc'))
-			.addDropdown((dropdown) => {
-				dropdown
-					.addOption('system', tr('settings.language.option.system'))
-					.addOption('zh-CN', tr('settings.language.option.zh-CN'))
-					.addOption('en', tr('settings.language.option.en'))
-					.setValue(this.plugin.settings.language)
-					.onChange(async (value) => {
-						this.plugin.settings.language = value as ParallelNotesSettings['language'];
-						await this.plugin.saveSettings();
-						this.display();
-					});
-			});
+	async setControlValue(key: string, value: unknown): Promise<void> {
+		switch (key) {
+			case 'language':
+				if (value === 'system' || value === 'zh-CN' || value === 'en') {
+					this.plugin.settings.language = value;
+				}
+				break;
+			case 'confirmBeforeCreate':
+				this.plugin.settings.confirmBeforeCreate = value === true;
+				break;
+			case 'globalSourceIndicatorHeight':
+				this.plugin.settings.globalSourceIndicatorHeight =
+					normalizeSourceIndicatorHeight(value);
+				break;
+			case 'globalDayCellMinHeight':
+				this.plugin.settings.globalDayCellMinHeight = normalizeDayCellMinHeight(value);
+				break;
+			default:
+				return;
+		}
 
-		new Setting(containerEl)
-			.setName(tr('settings.confirmBeforeCreate.name'))
-			.setDesc(tr('settings.confirmBeforeCreate.desc'))
-			.addToggle((toggle) => {
-				toggle.setValue(this.plugin.settings.confirmBeforeCreate).onChange((value) => {
-					this.plugin.settings.confirmBeforeCreate = value;
-					void this.plugin.saveSettings();
-				});
-			});
+		await this.plugin.saveSettings();
+		this.update();
+	}
 
-		new Setting(containerEl)
-			.setName(tr('settings.sourceIndicatorHeight.name'))
-			.setDesc(tr('settings.sourceIndicatorHeight.desc'))
-			.addText((text) => {
-				text.inputEl.type = 'number';
-				text.inputEl.min = String(MIN_SOURCE_INDICATOR_HEIGHT);
-				text.inputEl.max = String(MAX_SOURCE_INDICATOR_HEIGHT);
-				text.inputEl.step = '1';
-				text.inputEl.addClass('parallel-notes-number-input');
-				text.setValue(
-					String(
-						normalizeSourceIndicatorHeight(this.plugin.settings.globalSourceIndicatorHeight),
-					),
-				).onChange((value) => {
-					this.plugin.settings.globalSourceIndicatorHeight =
-						normalizeSourceIndicatorHeight(value);
-					text.setValue(String(this.plugin.settings.globalSourceIndicatorHeight));
-					void this.plugin.saveSettings();
-				});
-			});
-
-		new Setting(containerEl)
-			.setName(tr('settings.dayCellMinHeight.name'))
-			.setDesc(tr('settings.dayCellMinHeight.desc'))
-			.addText((text) => {
-				text.inputEl.type = 'number';
-				text.inputEl.min = String(MIN_DAY_CELL_MIN_HEIGHT);
-				text.inputEl.max = String(MAX_DAY_CELL_MIN_HEIGHT);
-				text.inputEl.step = '1';
-				text.inputEl.addClass('parallel-notes-number-input');
-				text.setValue(
-					String(normalizeDayCellMinHeight(this.plugin.settings.globalDayCellMinHeight)),
-				).onChange((value) => {
-					this.plugin.settings.globalDayCellMinHeight = normalizeDayCellMinHeight(value);
-					text.setValue(String(this.plugin.settings.globalDayCellMinHeight));
-					void this.plugin.saveSettings();
-				});
-			});
-
-		containerEl.createEl('p', {
-			text: tr('settings.calendarViewsDesc'),
-			cls: 'parallel-notes-settings-desc',
-		});
-
+	private renderCalendarViewSettings(containerEl: HTMLElement): void {
+		containerEl.empty();
+		const tr = this.plugin.t.bind(this.plugin);
 		const viewsContainer = containerEl.createDiv('parallel-notes-settings-views');
 		this.renderCalendarViews(viewsContainer);
 
@@ -144,10 +150,10 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 			void this.addCalendarView();
 		});
 
-		containerEl.createEl('div', {
+		containerEl.createDiv({
 			cls: 'parallel-notes-settings-footer-divider',
 		});
-		containerEl.createEl('div', {
+		containerEl.createDiv({
 			text: tr('settings.pathTemplateHint'),
 			cls: 'parallel-notes-field-hint',
 		});
@@ -169,7 +175,7 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 		};
 		this.plugin.settings.calendarViews.push(newView);
 		await this.plugin.saveSettings();
-		this.display();
+		this.update();
 	}
 
 	private renderCalendarViews(container: HTMLElement): void {
@@ -195,7 +201,7 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 		const cardHeader = card.createDiv('parallel-notes-settings-view-header');
 
 		const nameRow = cardHeader.createDiv('parallel-notes-settings-view-name');
-		nameRow.createEl('span', { text: tr('settings.viewName'), cls: 'parallel-notes-label' });
+		nameRow.createSpan({ text: tr('settings.viewName'), cls: 'parallel-notes-label' });
 
 		const nameInput = nameRow.createEl('input', {
 			cls: 'parallel-notes-view-name-input',
@@ -225,7 +231,7 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 		});
 
 		// ── Sources ───────────────────────────────────────────────────────────
-		card.createEl('div', {
+		card.createDiv({
 			text: tr('settings.noteSources'),
 			cls: 'parallel-notes-settings-section-title',
 		});
@@ -250,7 +256,7 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 	private async deleteCalendarView(index: number): Promise<void> {
 		this.plugin.settings.calendarViews.splice(index, 1);
 		await this.plugin.saveSettings();
-		this.display();
+		this.update();
 	}
 
 	private async addSource(config: CalendarViewConfig): Promise<void> {
@@ -265,7 +271,7 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 		};
 		config.sources.push(newSource);
 		await this.plugin.saveSettings();
-		this.display();
+		this.update();
 	}
 
 	private renderSourceConfig(
@@ -349,7 +355,7 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 	private async deleteSource(config: CalendarViewConfig, sourceIndex: number): Promise<void> {
 		config.sources.splice(sourceIndex, 1);
 		await this.plugin.saveSettings();
-		this.display();
+		this.update();
 	}
 
 	private async moveSource(
@@ -369,6 +375,6 @@ export class ParallelNotesSettingTab extends PluginSettingTab {
 
 		config.sources.splice(targetIndex, 0, source);
 		await this.plugin.saveSettings();
-		this.display();
+		this.update();
 	}
 }

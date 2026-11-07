@@ -86,7 +86,7 @@ export class CalendarView extends ItemView {
 
 		const config = this.getConfig();
 		if (!config) {
-			container.createEl('div', {
+			container.createDiv({
 				cls: 'parallel-notes-empty-state',
 				text: tr('calendar.configMissing'),
 			});
@@ -116,7 +116,7 @@ export class CalendarView extends ItemView {
 		const prevBtn = leftControls.createEl('button', { cls: 'parallel-notes-nav-btn', text: '‹' });
 		const nextBtn = leftControls.createEl('button', { cls: 'parallel-notes-nav-btn', text: '›' });
 
-		header.createEl('span', {
+		header.createSpan({
 			cls: 'parallel-notes-month-title',
 			text: formatMonthLabel(new Date(this.currentYear, this.currentMonth, 1), language),
 		});

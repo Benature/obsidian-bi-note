@@ -1,11 +1,15 @@
 import { moment } from 'obsidian';
 
+interface MomentDateFormatter {
+	format(template: string): string;
+}
+
 /**
  * Format only brace-wrapped moment expressions, keeping all other path text literal.
  * Square-bracket literals remain supported for compatibility.
  */
 export function formatPath(template: string, date: Date): string {
-	const formattedDate = moment(date);
+	const formattedDate = moment(date) as MomentDateFormatter;
 	let result = '';
 	let index = 0;
 

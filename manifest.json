@@ -1,8 +1,8 @@
 {
 	"id": "parallel-notes",
 	"name": "Parallel Notes",
-	"version": "1.0.1",
-	"minAppVersion": "0.15.0",
+	"version": "1.0.2",
+	"minAppVersion": "1.14.4",
 	"description": "Multiple customizable calendar views to visualize daily notes across different folders.",
 	"author": "Benature",
 	"authorUrl": "https://github.com/Benature",
