@@ -42,7 +42,7 @@ type TranslationKey =
 
 const translations: Record<ResolvedLanguage, Record<TranslationKey, string>> = {
 	'zh-CN': {
-		'main.ribbonTooltip': 'Bi-Note 日历',
+		'main.ribbonTooltip': 'Parallel Notes 日历',
 		'main.openCalendarCommand': '打开日历：{{name}}',
 		'settings.calendarViewsHeading': '日历视图',
 		'settings.language.name': '语言',
@@ -83,7 +83,7 @@ const translations: Record<ResolvedLanguage, Record<TranslationKey, string>> = {
 		'calendar.create': '创建',
 	},
 	en: {
-		'main.ribbonTooltip': 'Bi-Note calendar',
+		'main.ribbonTooltip': 'Parallel Notes calendar',
 		'main.openCalendarCommand': 'Open calendar: {{name}}',
 		'settings.calendarViewsHeading': 'Calendar views',
 		'settings.language.name': 'Language',
