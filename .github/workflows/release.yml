@@ -45,6 +45,8 @@ jobs:
         run: npm run build
 
       - name: Attest build provenance
+        # Do not block a reviewed release when GitHub's transparency log is unavailable.
+        continue-on-error: true
         uses: actions/attest-build-provenance@v4.2.2
         with:
           subject-path: |
