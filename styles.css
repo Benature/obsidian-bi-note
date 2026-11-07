@@ -2,7 +2,7 @@
    Calendar View
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.bi-note-calendar-container {
+.parallel-notes-calendar-container {
 	padding: 12px 16px;
 	height: 100%;
 	overflow-y: auto;
@@ -13,21 +13,21 @@
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
-.bi-note-calendar-header {
+.parallel-notes-calendar-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	margin-bottom: 10px;
 }
 
-.bi-note-header-left,
-.bi-note-header-right {
+.parallel-notes-header-left,
+.parallel-notes-header-right {
 	display: flex;
 	align-items: center;
 	gap: 4px;
 }
 
-.bi-note-nav-btn {
+.parallel-notes-nav-btn {
 	background: var(--background-modifier-hover);
 	border: none;
 	border-radius: 4px;
@@ -38,17 +38,17 @@
 	color: var(--text-normal);
 }
 
-.bi-note-nav-btn:hover {
+.parallel-notes-nav-btn:hover {
 	background: var(--background-modifier-active-hover);
 }
 
-.bi-note-month-title {
+.parallel-notes-month-title {
 	font-size: 15px;
 	font-weight: 600;
 	color: var(--text-normal);
 }
 
-.bi-note-today-btn {
+.parallel-notes-today-btn {
 	background: transparent;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
@@ -58,14 +58,14 @@
 	color: var(--text-muted);
 }
 
-.bi-note-today-btn:hover {
+.parallel-notes-today-btn:hover {
 	background: var(--background-modifier-hover);
 	color: var(--text-normal);
 }
 
 /* ── Legend ─────────────────────────────────────────────────────────────── */
 
-.bi-note-legend {
+.parallel-notes-legend {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 12px;
@@ -74,7 +74,7 @@
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.bi-note-legend-item {
+.parallel-notes-legend-item {
 	display: flex;
 	align-items: center;
 	gap: 5px;
@@ -82,7 +82,7 @@
 	color: var(--text-muted);
 }
 
-.bi-note-legend-dot {
+.parallel-notes-legend-dot {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
@@ -91,17 +91,17 @@
 
 /* ── Calendar grid ──────────────────────────────────────────────────────── */
 
-.bi-note-calendar-grid {
+.parallel-notes-calendar-grid {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	grid-template-rows: auto repeat(
-		var(--bi-note-calendar-week-rows, 6),
-		minmax(var(--bi-note-day-cell-min-height, 44px), auto)
+		var(--parallel-notes-calendar-week-rows, 6),
+		minmax(var(--parallel-notes-day-cell-min-height, 44px), auto)
 	);
 	gap: 3px;
 }
 
-.bi-note-day-header {
+.parallel-notes-day-header {
 	text-align: center;
 	font-size: 11px;
 	color: var(--text-faint);
@@ -111,39 +111,39 @@
 	padding: 4px 0 6px;
 }
 
-.bi-note-day-cell {
+.parallel-notes-day-cell {
 	display: flex;
 	flex-direction: column;
 	border-radius: 5px;
 	overflow: hidden;
 	background: var(--background-secondary);
-	min-height: var(--bi-note-day-cell-min-height, 44px);
+	min-height: var(--parallel-notes-day-cell-min-height, 44px);
 }
 
-.bi-note-day-empty {
+.parallel-notes-day-empty {
 	background: transparent;
 }
 
-.bi-note-today {
+.parallel-notes-today {
 	outline: 2px solid var(--color-accent);
 	outline-offset: -2px;
 }
 
-.bi-note-day-number {
+.parallel-notes-day-number {
 	font-size: 12px;
 	padding: 4px 5px 2px;
 	color: var(--text-muted);
 	text-align: right;
 }
 
-.bi-note-today .bi-note-day-number {
+.parallel-notes-today .parallel-notes-day-number {
 	color: var(--color-accent);
 	font-weight: 700;
 }
 
 /* ── Source indicators (split-cell strip) ───────────────────────────────── */
 
-.bi-note-day-sources {
+.parallel-notes-day-sources {
 	display: flex;
 	flex-direction: column;
 	gap: 1px;
@@ -151,32 +151,32 @@
 	margin-top: auto;
 }
 
-.bi-note-day-sources-row {
+.parallel-notes-day-sources-row {
 	display: grid;
 	gap: 1px;
 }
 
-.bi-note-source-indicator {
+.parallel-notes-source-indicator {
 	cursor: pointer;
 	transition: opacity 0.15s, filter 0.15s;
 	background-color: var(--background-modifier-border);
-	height: var(--bi-note-source-indicator-min-height, 12px);
+	height: var(--parallel-notes-source-indicator-min-height, 12px);
 	border-radius: 2px;
 }
 
-.bi-note-source-indicator.missing {
+.parallel-notes-source-indicator.missing {
 	background-color: var(--background-modifier-border);
 	opacity: 0.5;
 }
 
-.bi-note-source-indicator:hover {
+.parallel-notes-source-indicator:hover {
 	filter: brightness(1.2);
 	opacity: 1;
 }
 
 /* ── Empty state ─────────────────────────────────────────────────────────── */
 
-.bi-note-empty-state {
+.parallel-notes-empty-state {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -191,17 +191,17 @@
    Settings Tab
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.bi-note-settings-desc {
+.parallel-notes-settings-desc {
 	color: var(--text-muted);
 	font-size: 13px;
 	margin-bottom: 16px;
 }
 
-.bi-note-settings-views {
+.parallel-notes-settings-views {
 	margin-bottom: 12px;
 }
 
-.bi-note-settings-view-card {
+.parallel-notes-settings-view-card {
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 8px;
 	padding: 16px;
@@ -209,7 +209,7 @@
 	background: var(--background-secondary);
 }
 
-.bi-note-settings-view-header {
+.parallel-notes-settings-view-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -218,19 +218,19 @@
 	margin-bottom: 14px;
 }
 
-.bi-note-settings-view-name {
+.parallel-notes-settings-view-name {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 }
 
-.bi-note-label {
+.parallel-notes-label {
 	font-size: 13px;
 	color: var(--text-muted);
 	white-space: nowrap;
 }
 
-.bi-note-view-name-input {
+.parallel-notes-view-name-input {
 	background: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
@@ -240,12 +240,12 @@
 	width: 200px;
 }
 
-.bi-note-settings-view-actions {
+.parallel-notes-settings-view-actions {
 	display: flex;
 	gap: 6px;
 }
 
-.bi-note-settings-section-title {
+.parallel-notes-settings-section-title {
 	font-size: 11px;
 	font-weight: 700;
 	color: var(--text-faint);
@@ -254,14 +254,14 @@
 	margin-bottom: 8px;
 }
 
-.bi-note-settings-sources {
+.parallel-notes-settings-sources {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 	margin-bottom: 10px;
 }
 
-.bi-note-settings-source-item {
+.parallel-notes-settings-source-item {
 	display: flex;
 	align-items: flex-end;
 	gap: 10px;
@@ -272,13 +272,13 @@
 	flex-wrap: wrap;
 }
 
-.bi-note-settings-source-color {
+.parallel-notes-settings-source-color {
 	display: flex;
 	align-items: center;
 	padding-bottom: 2px;
 }
 
-.bi-note-color-input {
+.parallel-notes-color-input {
 	width: 34px;
 	height: 34px;
 	padding: 2px;
@@ -288,18 +288,18 @@
 	background: none;
 }
 
-.bi-note-settings-source-field {
+.parallel-notes-settings-source-field {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 }
 
-.bi-note-path-field {
+.parallel-notes-path-field {
 	flex: 1;
 	min-width: 200px;
 }
 
-.bi-note-field-label {
+.parallel-notes-field-label {
 	font-size: 10px;
 	font-weight: 700;
 	color: var(--text-faint);
@@ -307,7 +307,7 @@
 	letter-spacing: 0.05em;
 }
 
-.bi-note-text-input {
+.parallel-notes-text-input {
 	background: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
@@ -317,27 +317,27 @@
 	min-width: 140px;
 }
 
-.bi-note-number-input {
+.parallel-notes-number-input {
 	min-width: 84px;
 	width: 84px;
 }
 
-.bi-note-path-input {
+.parallel-notes-path-input {
 	font-family: var(--font-monospace);
 	font-size: 12px;
 }
 
-.bi-note-field-hint {
+.parallel-notes-field-hint {
 	font-size: 11px;
 	color: var(--text-faint);
 }
 
-.bi-note-settings-footer-divider {
+.parallel-notes-settings-footer-divider {
 	margin: 16px 0 8px;
 	border-top: 1px solid var(--background-modifier-border);
 }
 
-.bi-note-settings-source-actions {
+.parallel-notes-settings-source-actions {
 	display: flex;
 	align-items: flex-end;
 	gap: 6px;
@@ -347,7 +347,7 @@
 
 /* ── Shared button styles ───────────────────────────────────────────────── */
 
-.bi-note-btn {
+.parallel-notes-btn {
 	background: var(--background-modifier-hover);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
@@ -359,46 +359,46 @@
 	white-space: nowrap;
 }
 
-.bi-note-btn:hover {
+.parallel-notes-btn:hover {
 	background: var(--background-modifier-active-hover);
 }
 
-.bi-note-btn-cta {
+.parallel-notes-btn-cta {
 	background: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border-color: var(--interactive-accent);
 }
 
-.bi-note-btn-cta:hover {
+.parallel-notes-btn-cta:hover {
 	background: var(--interactive-accent-hover);
 }
 
-.bi-note-btn-secondary {
+.parallel-notes-btn-secondary {
 	background: transparent;
 	color: var(--text-muted);
 	border-style: dashed;
 }
 
-.bi-note-btn-secondary:hover {
+.parallel-notes-btn-secondary:hover {
 	background: var(--background-modifier-hover);
 	color: var(--text-normal);
 }
 
-.bi-note-btn-danger {
+.parallel-notes-btn-danger {
 	color: var(--text-error);
 }
 
-.bi-note-btn-danger:hover {
+.parallel-notes-btn-danger:hover {
 	background: var(--background-modifier-error-hover);
 }
 
-.bi-note-btn-icon {
+.parallel-notes-btn-icon {
 	padding: 4px 8px;
 	font-size: 16px;
 	line-height: 1;
 }
 
-.bi-note-btn:disabled {
+.parallel-notes-btn:disabled {
 	cursor: not-allowed;
 	opacity: 0.45;
 }

@@ -1,4 +1,4 @@
-import type { BiNoteLanguage } from './types';
+import type { ParallelNotesLanguage } from './types';
 
 export type ResolvedLanguage = 'zh-CN' | 'en';
 
@@ -132,7 +132,7 @@ const WEEKDAY_LABELS: Record<ResolvedLanguage, string[]> = {
 	en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 };
 
-export function resolveLanguage(language: BiNoteLanguage): ResolvedLanguage {
+export function resolveLanguage(language: ParallelNotesLanguage): ResolvedLanguage {
 	if (language === 'zh-CN' || language === 'en') {
 		return language;
 	}

@@ -8,7 +8,7 @@ import {
 	ViewStateResult,
 	WorkspaceLeaf,
 } from 'obsidian';
-import type BiNotePlugin from '../main';
+import type ParallelNotesPlugin from '../main';
 import { formatMonthLabel, getWeekdayLabels } from '../i18n';
 import {
 	type CalendarViewConfig,
@@ -17,15 +17,15 @@ import {
 } from '../types';
 import { getFilePath, isSameDay } from '../utils/dateUtils';
 
-export const CALENDAR_VIEW_TYPE = 'bi-note-calendar';
+export const CALENDAR_VIEW_TYPE = 'parallel-notes-calendar';
 
 export class CalendarView extends ItemView {
-	private plugin: BiNotePlugin;
+	private plugin: ParallelNotesPlugin;
 	private configId = '';
 	private currentYear: number;
 	private currentMonth: number;
 
-	constructor(leaf: WorkspaceLeaf, plugin: BiNotePlugin) {
+	constructor(leaf: WorkspaceLeaf, plugin: ParallelNotesPlugin) {
 		super(leaf);
 		this.plugin = plugin;
 		const now = new Date();
@@ -81,24 +81,24 @@ export class CalendarView extends ItemView {
 	private render(): void {
 		const container = this.contentEl;
 		container.empty();
-		container.addClass('bi-note-calendar-container');
+		container.addClass('parallel-notes-calendar-container');
 		const tr = this.plugin.t.bind(this.plugin);
 
 		const config = this.getConfig();
 		if (!config) {
 			container.createEl('div', {
-				cls: 'bi-note-empty-state',
+				cls: 'parallel-notes-empty-state',
 				text: tr('calendar.configMissing'),
 			});
 			return;
 		}
 
 		container.style.setProperty(
-			'--bi-note-source-indicator-min-height',
+			'--parallel-notes-source-indicator-min-height',
 			`${getSourceIndicatorHeight(this.plugin)}px`,
 		);
 		container.style.setProperty(
-			'--bi-note-day-cell-min-height',
+			'--parallel-notes-day-cell-min-height',
 			`${getDayCellMinHeight(this.plugin)}px`,
 		);
 		this.renderCalendar(container, config);
@@ -110,20 +110,20 @@ export class CalendarView extends ItemView {
 		const tr = this.plugin.t.bind(this.plugin);
 
 		// ── Header ────────────────────────────────────────────────────────────
-		const header = container.createDiv('bi-note-calendar-header');
+		const header = container.createDiv('parallel-notes-calendar-header');
 
-		const leftControls = header.createDiv('bi-note-header-left');
-		const prevBtn = leftControls.createEl('button', { cls: 'bi-note-nav-btn', text: '‹' });
-		const nextBtn = leftControls.createEl('button', { cls: 'bi-note-nav-btn', text: '›' });
+		const leftControls = header.createDiv('parallel-notes-header-left');
+		const prevBtn = leftControls.createEl('button', { cls: 'parallel-notes-nav-btn', text: '‹' });
+		const nextBtn = leftControls.createEl('button', { cls: 'parallel-notes-nav-btn', text: '›' });
 
 		header.createEl('span', {
-			cls: 'bi-note-month-title',
+			cls: 'parallel-notes-month-title',
 			text: formatMonthLabel(new Date(this.currentYear, this.currentMonth, 1), language),
 		});
 
-		const rightControls = header.createDiv('bi-note-header-right');
+		const rightControls = header.createDiv('parallel-notes-header-right');
 		const todayBtn = rightControls.createEl('button', {
-			cls: 'bi-note-today-btn',
+			cls: 'parallel-notes-today-btn',
 			text: tr('calendar.today'),
 		});
 
@@ -156,32 +156,32 @@ export class CalendarView extends ItemView {
 
 		// ── Legend ────────────────────────────────────────────────────────────
 		if (config.sources.length > 0) {
-			const legend = container.createDiv('bi-note-legend');
+			const legend = container.createDiv('parallel-notes-legend');
 			for (const source of config.sources) {
-				const item = legend.createDiv('bi-note-legend-item');
-				const dot = item.createDiv('bi-note-legend-dot');
+				const item = legend.createDiv('parallel-notes-legend-item');
+				const dot = item.createDiv('parallel-notes-legend-dot');
 				dot.style.backgroundColor = source.color;
 				item.createSpan({ text: source.name });
 			}
 		}
 
 		// ── Calendar grid ─────────────────────────────────────────────────────
-		const grid = container.createDiv('bi-note-calendar-grid');
+		const grid = container.createDiv('parallel-notes-calendar-grid');
 
 		const dayNames = getWeekdayLabels(language);
 		for (const name of dayNames) {
-			grid.createDiv({ text: name, cls: 'bi-note-day-header' });
+			grid.createDiv({ text: name, cls: 'parallel-notes-day-header' });
 		}
 
 		const firstDay = new Date(this.currentYear, this.currentMonth, 1);
 		const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
 		const leadingEmptyCells = firstDay.getDay();
 		const weekRows = Math.ceil((leadingEmptyCells + daysInMonth) / 7);
-		grid.style.setProperty('--bi-note-calendar-week-rows', String(weekRows));
+		grid.style.setProperty('--parallel-notes-calendar-week-rows', String(weekRows));
 
 		// Leading empty cells
 		for (let i = 0; i < leadingEmptyCells; i++) {
-			grid.createDiv('bi-note-day-cell bi-note-day-empty');
+			grid.createDiv('parallel-notes-day-cell parallel-notes-day-empty');
 		}
 
 		// Day cells
@@ -190,15 +190,15 @@ export class CalendarView extends ItemView {
 			const isToday = isSameDay(date, today);
 
 			const cell = grid.createDiv(
-				'bi-note-day-cell' + (isToday ? ' bi-note-today' : ''),
+				'parallel-notes-day-cell' + (isToday ? ' parallel-notes-today' : ''),
 			);
-			cell.createDiv({ text: String(d), cls: 'bi-note-day-number' });
+			cell.createDiv({ text: String(d), cls: 'parallel-notes-day-number' });
 
 			if (config.sources.length > 0) {
-				const sourcesWrap = cell.createDiv('bi-note-day-sources');
+				const sourcesWrap = cell.createDiv('parallel-notes-day-sources');
 				let sourceIndex = 0;
 				for (const rowLength of getSourceRowLengths(config.sources.length)) {
-					const sourcesRow = sourcesWrap.createDiv('bi-note-day-sources-row');
+					const sourcesRow = sourcesWrap.createDiv('parallel-notes-day-sources-row');
 					sourcesRow.style.gridTemplateColumns = `repeat(${rowLength}, minmax(0, 1fr))`;
 
 					for (let i = 0; i < rowLength; i++) {
@@ -212,7 +212,7 @@ export class CalendarView extends ItemView {
 						const exists = file instanceof TFile;
 
 						const indicator = sourcesRow.createDiv({
-							cls: `bi-note-source-indicator ${exists ? 'exists' : 'missing'}`,
+							cls: `parallel-notes-source-indicator ${exists ? 'exists' : 'missing'}`,
 						});
 						if (exists) {
 							indicator.style.backgroundColor = source.color;
@@ -230,7 +230,7 @@ export class CalendarView extends ItemView {
 
 		const trailingEmptyCells = weekRows * 7 - (leadingEmptyCells + daysInMonth);
 		for (let i = 0; i < trailingEmptyCells; i++) {
-			grid.createDiv('bi-note-day-cell bi-note-day-empty');
+			grid.createDiv('parallel-notes-day-cell parallel-notes-day-empty');
 		}
 	}
 
@@ -267,13 +267,13 @@ export class CalendarView extends ItemView {
 }
 
 class ConfirmCreateNoteModal extends Modal {
-	private readonly plugin: BiNotePlugin;
+	private readonly plugin: ParallelNotesPlugin;
 	private readonly filePath: string;
 	private readonly onSubmit: (confirmed: boolean) => void;
 
 	constructor(
 		app: App,
-		plugin: BiNotePlugin,
+		plugin: ParallelNotesPlugin,
 		filePath: string,
 		onSubmit: (confirmed: boolean) => void,
 	) {
@@ -315,7 +315,7 @@ class ConfirmCreateNoteModal extends Modal {
 	}
 }
 
-function confirmCreateNote(app: App, plugin: BiNotePlugin, filePath: string): Promise<boolean> {
+function confirmCreateNote(app: App, plugin: ParallelNotesPlugin, filePath: string): Promise<boolean> {
 	return new Promise((resolve) => {
 		let resolved = false;
 		const modal = new ConfirmCreateNoteModal(app, plugin, filePath, (confirmed) => {
@@ -362,10 +362,10 @@ function getSourceRowLengths(sourceCount: number): number[] {
 	return Array.from({ length: rows }, (_, index) => baseSize + (index >= rows - remainder ? 1 : 0));
 }
 
-function getSourceIndicatorHeight(plugin: BiNotePlugin): number {
+function getSourceIndicatorHeight(plugin: ParallelNotesPlugin): number {
 	return normalizeSourceIndicatorHeight(plugin.settings.globalSourceIndicatorHeight);
 }
 
-function getDayCellMinHeight(plugin: BiNotePlugin): number {
+function getDayCellMinHeight(plugin: ParallelNotesPlugin): number {
 	return normalizeDayCellMinHeight(plugin.settings.globalDayCellMinHeight);
 }

@@ -1,6 +1,6 @@
 {
-	"name": "bi-note",
-	"version": "1.0.0",
+	"name": "parallel-notes",
+	"version": "1.0.1",
 	"description": "Multiple customizable calendar views for Obsidian notes across different folders.",
 	"main": "main.js",
 	"type": "module",

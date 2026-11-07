@@ -1,8 +1,8 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import type BiNotePlugin from './main';
+import type ParallelNotesPlugin from './main';
 import { resolveLanguage, t } from './i18n';
 import {
-	BiNoteSettings,
+	ParallelNotesSettings,
 	CalendarViewConfig,
 	NoteSource,
 	DEFAULT_COLORS,
@@ -17,9 +17,9 @@ import {
 	normalizeSourceIndicatorHeight,
 } from './types';
 
-export type { BiNoteSettings };
+export type { ParallelNotesSettings };
 
-export const DEFAULT_SETTINGS: BiNoteSettings = {
+export const DEFAULT_SETTINGS: ParallelNotesSettings = {
 	confirmBeforeCreate: true,
 	globalSourceIndicatorHeight: DEFAULT_SOURCE_INDICATOR_HEIGHT,
 	globalDayCellMinHeight: DEFAULT_DAY_CELL_MIN_HEIGHT,
@@ -46,10 +46,10 @@ export const DEFAULT_SETTINGS: BiNoteSettings = {
 	],
 };
 
-export class BiNoteSettingTab extends PluginSettingTab {
-	plugin: BiNotePlugin;
+export class ParallelNotesSettingTab extends PluginSettingTab {
+	plugin: ParallelNotesPlugin;
 
-	constructor(app: App, plugin: BiNotePlugin) {
+	constructor(app: App, plugin: ParallelNotesPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -73,7 +73,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 					.addOption('en', tr('settings.language.option.en'))
 					.setValue(this.plugin.settings.language)
 					.onChange(async (value) => {
-						this.plugin.settings.language = value as BiNoteSettings['language'];
+						this.plugin.settings.language = value as ParallelNotesSettings['language'];
 						await this.plugin.saveSettings();
 						this.display();
 					});
@@ -97,7 +97,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 				text.inputEl.min = String(MIN_SOURCE_INDICATOR_HEIGHT);
 				text.inputEl.max = String(MAX_SOURCE_INDICATOR_HEIGHT);
 				text.inputEl.step = '1';
-				text.inputEl.addClass('bi-note-number-input');
+				text.inputEl.addClass('parallel-notes-number-input');
 				text.setValue(
 					String(
 						normalizeSourceIndicatorHeight(this.plugin.settings.globalSourceIndicatorHeight),
@@ -118,7 +118,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 				text.inputEl.min = String(MIN_DAY_CELL_MIN_HEIGHT);
 				text.inputEl.max = String(MAX_DAY_CELL_MIN_HEIGHT);
 				text.inputEl.step = '1';
-				text.inputEl.addClass('bi-note-number-input');
+				text.inputEl.addClass('parallel-notes-number-input');
 				text.setValue(
 					String(normalizeDayCellMinHeight(this.plugin.settings.globalDayCellMinHeight)),
 				).onChange((value) => {
@@ -130,26 +130,26 @@ export class BiNoteSettingTab extends PluginSettingTab {
 
 		containerEl.createEl('p', {
 			text: tr('settings.calendarViewsDesc'),
-			cls: 'bi-note-settings-desc',
+			cls: 'parallel-notes-settings-desc',
 		});
 
-		const viewsContainer = containerEl.createDiv('bi-note-settings-views');
+		const viewsContainer = containerEl.createDiv('parallel-notes-settings-views');
 		this.renderCalendarViews(viewsContainer);
 
 		const addBtn = containerEl.createEl('button', {
 			text: tr('settings.addCalendarView'),
-			cls: 'bi-note-btn bi-note-btn-cta',
+			cls: 'parallel-notes-btn parallel-notes-btn-cta',
 		});
 		addBtn.addEventListener('click', () => {
 			void this.addCalendarView();
 		});
 
 		containerEl.createEl('div', {
-			cls: 'bi-note-settings-footer-divider',
+			cls: 'parallel-notes-settings-footer-divider',
 		});
 		containerEl.createEl('div', {
 			text: tr('settings.pathTemplateHint'),
-			cls: 'bi-note-field-hint',
+			cls: 'parallel-notes-field-hint',
 		});
 	}
 
@@ -188,17 +188,17 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		config: CalendarViewConfig,
 		index: number,
 	): void {
-		const card = container.createDiv('bi-note-settings-view-card');
+		const card = container.createDiv('parallel-notes-settings-view-card');
 		const tr = this.plugin.t.bind(this.plugin);
 
 		// ── Card header ───────────────────────────────────────────────────────
-		const cardHeader = card.createDiv('bi-note-settings-view-header');
+		const cardHeader = card.createDiv('parallel-notes-settings-view-header');
 
-		const nameRow = cardHeader.createDiv('bi-note-settings-view-name');
-		nameRow.createEl('span', { text: tr('settings.viewName'), cls: 'bi-note-label' });
+		const nameRow = cardHeader.createDiv('parallel-notes-settings-view-name');
+		nameRow.createEl('span', { text: tr('settings.viewName'), cls: 'parallel-notes-label' });
 
 		const nameInput = nameRow.createEl('input', {
-			cls: 'bi-note-view-name-input',
+			cls: 'parallel-notes-view-name-input',
 			attr: { type: 'text', value: config.name },
 		});
 		nameInput.addEventListener('change', () => {
@@ -206,11 +206,11 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			void this.plugin.saveSettings();
 		});
 
-		const actions = cardHeader.createDiv('bi-note-settings-view-actions');
+		const actions = cardHeader.createDiv('parallel-notes-settings-view-actions');
 
 		const openBtn = actions.createEl('button', {
 			text: tr('settings.openView'),
-			cls: 'bi-note-btn',
+			cls: 'parallel-notes-btn',
 		});
 		openBtn.addEventListener('click', () => {
 			void this.plugin.openCalendarView(config.id);
@@ -218,7 +218,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 
 		const deleteBtn = actions.createEl('button', {
 			text: tr('settings.delete'),
-			cls: 'bi-note-btn bi-note-btn-danger',
+			cls: 'parallel-notes-btn parallel-notes-btn-danger',
 		});
 		deleteBtn.addEventListener('click', () => {
 			void this.deleteCalendarView(index);
@@ -227,10 +227,10 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		// ── Sources ───────────────────────────────────────────────────────────
 		card.createEl('div', {
 			text: tr('settings.noteSources'),
-			cls: 'bi-note-settings-section-title',
+			cls: 'parallel-notes-settings-section-title',
 		});
 
-		const sourcesContainer = card.createDiv('bi-note-settings-sources');
+		const sourcesContainer = card.createDiv('parallel-notes-settings-sources');
 		for (let j = 0; j < config.sources.length; j++) {
 			const source = config.sources[j];
 			if (source) {
@@ -240,7 +240,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 
 		const addSourceBtn = card.createEl('button', {
 			text: tr('settings.addSource'),
-			cls: 'bi-note-btn bi-note-btn-secondary',
+			cls: 'parallel-notes-btn parallel-notes-btn-secondary',
 		});
 		addSourceBtn.addEventListener('click', () => {
 			void this.addSource(config);
@@ -274,13 +274,13 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		source: NoteSource,
 		sourceIndex: number,
 	): void {
-		const row = container.createDiv('bi-note-settings-source-item');
+		const row = container.createDiv('parallel-notes-settings-source-item');
 		const tr = this.plugin.t.bind(this.plugin);
 
 		// Color picker
-		const colorWrap = row.createDiv('bi-note-settings-source-color');
+		const colorWrap = row.createDiv('parallel-notes-settings-source-color');
 		const colorInput = colorWrap.createEl('input', {
-			cls: 'bi-note-color-input',
+			cls: 'parallel-notes-color-input',
 			attr: { type: 'color', value: source.color },
 		});
 		colorInput.addEventListener('change', () => {
@@ -289,10 +289,10 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		});
 
 		// Name field
-		const nameField = row.createDiv('bi-note-settings-source-field');
-		nameField.createEl('label', { text: tr('settings.sourceName'), cls: 'bi-note-field-label' });
+		const nameField = row.createDiv('parallel-notes-settings-source-field');
+		nameField.createEl('label', { text: tr('settings.sourceName'), cls: 'parallel-notes-field-label' });
 		const nameInput = nameField.createEl('input', {
-			cls: 'bi-note-text-input',
+			cls: 'parallel-notes-text-input',
 			attr: { type: 'text', value: source.name },
 		});
 		nameInput.addEventListener('change', () => {
@@ -301,10 +301,10 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		});
 
 		// Path template field
-		const pathField = row.createDiv('bi-note-settings-source-field bi-note-path-field');
-		pathField.createEl('label', { text: tr('settings.pathTemplate'), cls: 'bi-note-field-label' });
+		const pathField = row.createDiv('parallel-notes-settings-source-field parallel-notes-path-field');
+		pathField.createEl('label', { text: tr('settings.pathTemplate'), cls: 'parallel-notes-field-label' });
 		const pathInput = pathField.createEl('input', {
-			cls: 'bi-note-text-input bi-note-path-input',
+			cls: 'parallel-notes-text-input parallel-notes-path-input',
 			attr: {
 				type: 'text',
 				value: source.pathTemplate,
@@ -316,11 +316,11 @@ export class BiNoteSettingTab extends PluginSettingTab {
 			void this.plugin.saveSettings();
 		});
 
-		const actionsWrap = row.createDiv('bi-note-settings-source-actions');
+		const actionsWrap = row.createDiv('parallel-notes-settings-source-actions');
 
 		const moveUpBtn = actionsWrap.createEl('button', {
 			text: '↑',
-			cls: 'bi-note-btn bi-note-btn-icon',
+			cls: 'parallel-notes-btn parallel-notes-btn-icon',
 		});
 		moveUpBtn.disabled = sourceIndex === 0;
 		moveUpBtn.addEventListener('click', () => {
@@ -329,7 +329,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 
 		const moveDownBtn = actionsWrap.createEl('button', {
 			text: '↓',
-			cls: 'bi-note-btn bi-note-btn-icon',
+			cls: 'parallel-notes-btn parallel-notes-btn-icon',
 		});
 		moveDownBtn.disabled = sourceIndex === config.sources.length - 1;
 		moveDownBtn.addEventListener('click', () => {
@@ -339,7 +339,7 @@ export class BiNoteSettingTab extends PluginSettingTab {
 		// Delete button
 		const deleteBtn = actionsWrap.createEl('button', {
 			text: '×',
-			cls: 'bi-note-btn bi-note-btn-icon bi-note-btn-danger',
+			cls: 'parallel-notes-btn parallel-notes-btn-icon parallel-notes-btn-danger',
 		});
 		deleteBtn.addEventListener('click', () => {
 			void this.deleteSource(config, sourceIndex);

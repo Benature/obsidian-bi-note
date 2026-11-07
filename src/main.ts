@@ -1,6 +1,6 @@
 import { Plugin } from 'obsidian';
-import type { BiNoteSettings, CalendarViewConfig } from './types';
-import { DEFAULT_SETTINGS, BiNoteSettingTab } from './settings';
+import type { ParallelNotesSettings, CalendarViewConfig } from './types';
+import { DEFAULT_SETTINGS, ParallelNotesSettingTab } from './settings';
 import { CALENDAR_VIEW_TYPE, CalendarView } from './views/CalendarView';
 import { resolveLanguage, t, type ResolvedLanguage } from './i18n';
 import {
@@ -10,8 +10,8 @@ import {
 	normalizeSourceIndicatorHeight,
 } from './types';
 
-export default class BiNotePlugin extends Plugin {
-	settings: BiNoteSettings;
+export default class ParallelNotesPlugin extends Plugin {
+	settings: ParallelNotesSettings;
 
 	async onload(): Promise<void> {
 		await this.loadSettings();
@@ -21,7 +21,7 @@ export default class BiNotePlugin extends Plugin {
 			(leaf) => new CalendarView(leaf, this),
 		);
 
-		this.addSettingTab(new BiNoteSettingTab(this.app, this));
+		this.addSettingTab(new ParallelNotesSettingTab(this.app, this));
 		this.registerVaultRefreshEvents();
 
 		this.registerCalendarCommands();
@@ -77,7 +77,7 @@ export default class BiNotePlugin extends Plugin {
 
 	async loadSettings(): Promise<void> {
 		const savedData: unknown = await this.loadData();
-		const saved = isRecord(savedData) ? (savedData as Partial<BiNoteSettings>) : null;
+		const saved = isRecord(savedData) ? (savedData as Partial<ParallelNotesSettings>) : null;
 		const migratedHeights = getMigratedGlobalHeights(saved?.calendarViews);
 		this.settings = {
 			...DEFAULT_SETTINGS,
@@ -116,7 +116,7 @@ export default class BiNotePlugin extends Plugin {
 
 function getMigratedGlobalHeights(
 	calendarViews: CalendarViewConfig[] | undefined,
-): Pick<BiNoteSettings, 'globalSourceIndicatorHeight' | 'globalDayCellMinHeight'> {
+): Pick<ParallelNotesSettings, 'globalSourceIndicatorHeight' | 'globalDayCellMinHeight'> {
 	const firstSourceIndicatorHeight = calendarViews?.find(
 		(view) => typeof view.sourceIndicatorHeight === 'number',
 	)?.sourceIndicatorHeight;

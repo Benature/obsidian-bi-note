@@ -14,15 +14,15 @@ export interface CalendarViewConfig {
 	dayCellMinHeight?: number;
 }
 
-export interface BiNoteSettings {
+export interface ParallelNotesSettings {
 	calendarViews: CalendarViewConfig[];
 	confirmBeforeCreate: boolean;
 	globalSourceIndicatorHeight: number;
 	globalDayCellMinHeight: number;
-	language: BiNoteLanguage;
+	language: ParallelNotesLanguage;
 }
 
-export type BiNoteLanguage = 'system' | 'zh-CN' | 'en';
+export type ParallelNotesLanguage = 'system' | 'zh-CN' | 'en';
 
 export const DEFAULT_COLORS = [
 	'#4a9eff',

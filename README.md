@@ -105,7 +105,7 @@ npm run lint
 Copy the release files into:
 
 ```text
-<your-vault>/.obsidian/plugins/bi-note/
+<your-vault>/.obsidian/plugins/parallel-notes/
 ```
 
 Required files:

@@ -105,7 +105,7 @@ npm run lint
 将发布文件复制到：
 
 ```text
-<your-vault>/.obsidian/plugins/bi-note/
+<your-vault>/.obsidian/plugins/parallel-notes/
 ```
 
 必需文件：
