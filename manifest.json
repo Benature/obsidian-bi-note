@@ -1,7 +1,7 @@
 {
 	"id": "bi-note",
 	"name": "Parallel Notes",
-	"version": "0.0.3",
+	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "Multiple customizable calendar views to visualize daily notes across different folders.",
 	"author": "Benature",
